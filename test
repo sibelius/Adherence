@@ -1,0 +1,2014 @@
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/ESSensorManager.java ../SensorManager/src/com/ubhave/sensormanager/ESSensorManager.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/ESSensorManager.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/ESSensorManager.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,6 +22,9 @@
+ 
+ package com.ubhave.sensormanager;
+ 
++import java.util.ArrayList;
++import java.util.List;
++
+ import android.content.Context;
+ import android.content.pm.PackageManager;
+ import android.os.PowerManager;
+@@ -41,9 +44,6 @@
+ import com.ubhave.sensormanager.tasks.Subscription;
+ import com.ubhave.sensormanager.tasks.SubscriptionList;
+ 
+-import java.util.ArrayList;
+-import java.util.List;
+-
+ public class ESSensorManager implements ESSensorManagerInterface, SensorDataListener
+ {
+ 	private static final String TAG = "ESSensorManager";
+@@ -91,8 +91,9 @@
+ 		ArrayList<SensorInterface> sensors = SensorUtils.getAllSensors(appContext);
+ 		for (SensorInterface aSensor : sensors)
+ 		{
++			int sensorType = aSensor.getSensorType();
+ 			AbstractSensorTask sensorTask;
+-			if (SensorUtils.isPullSensor(aSensor.getSensorType()))
++			if (SensorUtils.isPullSensor(sensorType))
+ 			{
+ 				sensorTask = new PullSensorTask(aSensor);
+ 			}
+@@ -102,7 +103,7 @@
+ 			}
+ 
+ 			sensorTask.start();
+-			sensorTaskMap.put(aSensor.getSensorType(), sensorTask);
++			sensorTaskMap.put(sensorType, sensorTask);
+ 		}
+ 	}
+ 	
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/classifier/AccelerometerDataClassifier.java ../SensorManager/src/com/ubhave/sensormanager/classifier/AccelerometerDataClassifier.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/classifier/AccelerometerDataClassifier.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/classifier/AccelerometerDataClassifier.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,12 +22,12 @@
+ 
+ package com.ubhave.sensormanager.classifier;
+ 
++import java.util.ArrayList;
++
+ import com.ubhave.sensormanager.config.sensors.pull.AccelerometerConfig;
+ import com.ubhave.sensormanager.data.SensorData;
+ import com.ubhave.sensormanager.data.pullsensor.AccelerometerData;
+ 
+-import java.util.ArrayList;
+-
+ public class AccelerometerDataClassifier implements SensorDataClassifier
+ {
+ 
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/classifier/BluetoothDataClassifier.java ../SensorManager/src/com/ubhave/sensormanager/classifier/BluetoothDataClassifier.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/classifier/BluetoothDataClassifier.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/classifier/BluetoothDataClassifier.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,12 +22,12 @@
+ 
+ package com.ubhave.sensormanager.classifier;
+ 
++import java.util.ArrayList;
++
+ import com.ubhave.sensormanager.data.SensorData;
+ import com.ubhave.sensormanager.data.pullsensor.BluetoothData;
+ import com.ubhave.sensormanager.data.pullsensor.ESBluetoothDevice;
+ 
+-import java.util.ArrayList;
+-
+ public class BluetoothDataClassifier extends SocialClassifier implements SensorDataClassifier
+ {
+ 
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/classifier/SocialClassifier.java ../SensorManager/src/com/ubhave/sensormanager/classifier/SocialClassifier.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/classifier/SocialClassifier.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/classifier/SocialClassifier.java	2014-06-11 22:20:22.000000000 -0700
+@@ -23,7 +23,6 @@
+ package com.ubhave.sensormanager.classifier;
+ 
+ import android.annotation.SuppressLint;
+-
+ import java.util.HashSet;
+ import java.util.Set;
+ 
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/classifier/WifiDataClassifier.java ../SensorManager/src/com/ubhave/sensormanager/classifier/WifiDataClassifier.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/classifier/WifiDataClassifier.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/classifier/WifiDataClassifier.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,12 +22,12 @@
+ 
+ package com.ubhave.sensormanager.classifier;
+ 
++import java.util.ArrayList;
++
+ import com.ubhave.sensormanager.data.SensorData;
+ import com.ubhave.sensormanager.data.pullsensor.WifiData;
+ import com.ubhave.sensormanager.data.pullsensor.WifiScanResult;
+ 
+-import java.util.ArrayList;
+-
+ public class WifiDataClassifier extends SocialClassifier implements SensorDataClassifier
+ {
+ 
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/config/sensors/pull/AccelerometerConfig.java ../SensorManager/src/com/ubhave/sensormanager/config/sensors/pull/AccelerometerConfig.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/config/sensors/pull/AccelerometerConfig.java	2014-05-30 17:16:10.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/config/sensors/pull/AccelerometerConfig.java	2014-06-11 22:20:22.000000000 -0700
+@@ -1,35 +1,31 @@
+-package com.ubhave.sensormanager.config.sensors.pull;
++/* **************************************************
++ Copyright (c) 2014
++
++This library was developed as part of the EPSRC Ubhave (Ubiquitous and
++Social Computing for Positive Behaviour Change) Project. For more
++information, please visit http://www.emotionsense.org
++
++Permission to use, copy, modify, and/or distribute this software for any
++purpose with or without fee is hereby granted, provided that the above
++copyright notice and this permission notice appear in all copies.
++
++THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
++WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
++MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
++SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
++IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ ************************************************** */
+ 
+-import android.hardware.SensorManager;
++package com.ubhave.sensormanager.config.sensors.pull;
+ 
+-import com.ubhave.sensormanager.config.SensorConfig;
+ 
+ public class AccelerometerConfig
+ {
+ 	/*
+-	 * Config keys
+-	 */
+-	public final static String SAMPLING_DELAY = "ACCELEROMETER_SAMPLING_DELAY";
+-	
+-	/*
+-	 * Default values
+-	 */
+-	public static final long DEFAULT_SAMPLING_WINDOW_SIZE_MILLIS = 8000L;
+-	public static final long DEFAULT_SLEEP_INTERVAL = 2 * 60 * 1000L;
+-	public static final int DEFAULT_SAMPLING_DELAY = SensorManager.SENSOR_DELAY_GAME;
+-	
+-	/*
+ 	 * Classifier thresholds
+ 	 */
+ 	public final static int ACCELEROMETER_MOVEMENT_THRESHOLD = 25;
+ 	
+-	
+-	public static SensorConfig getDefault()
+-	{
+-		SensorConfig sensorConfig = new SensorConfig();
+-		sensorConfig.setParameter(PullSensorConfig.POST_SENSE_SLEEP_LENGTH_MILLIS, DEFAULT_SLEEP_INTERVAL);
+-		sensorConfig.setParameter(AccelerometerConfig.SAMPLING_DELAY, DEFAULT_SAMPLING_DELAY);
+-		sensorConfig.setParameter(PullSensorConfig.SENSE_WINDOW_LENGTH_MILLIS, DEFAULT_SAMPLING_WINDOW_SIZE_MILLIS);
+-		return sensorConfig;
+-	}
+ }
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/config/sensors/pull/MotionSensorConfig.java ../SensorManager/src/com/ubhave/sensormanager/config/sensors/pull/MotionSensorConfig.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/config/sensors/pull/MotionSensorConfig.java	1969-12-31 17:00:00.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/config/sensors/pull/MotionSensorConfig.java	2014-06-11 22:20:22.000000000 -0700
+@@ -0,0 +1,50 @@
++/* **************************************************
++ Copyright (c) 2014
++
++This library was developed as part of the EPSRC Ubhave (Ubiquitous and
++Social Computing for Positive Behaviour Change) Project. For more
++information, please visit http://www.emotionsense.org
++
++Permission to use, copy, modify, and/or distribute this software for any
++purpose with or without fee is hereby granted, provided that the above
++copyright notice and this permission notice appear in all copies.
++
++THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
++WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
++MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
++SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
++IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ ************************************************** */
++
++package com.ubhave.sensormanager.config.sensors.pull;
++
++import android.hardware.SensorManager;
++
++import com.ubhave.sensormanager.config.SensorConfig;
++
++public class MotionSensorConfig
++{
++	/*
++	 * Config keys
++	 */
++	public final static String SAMPLING_DELAY = "MOTION_SAMPLING_DELAY";
++	
++	/*
++	 * Default values
++	 */
++	public static final long DEFAULT_SAMPLING_WINDOW_SIZE_MILLIS = 8000L;
++	public static final long DEFAULT_SLEEP_INTERVAL = 2 * 60 * 1000L;
++	public static final int DEFAULT_SAMPLING_DELAY = SensorManager.SENSOR_DELAY_GAME;
++	
++	
++	public static SensorConfig getDefault()
++	{
++		SensorConfig sensorConfig = new SensorConfig();
++		sensorConfig.setParameter(PullSensorConfig.POST_SENSE_SLEEP_LENGTH_MILLIS, DEFAULT_SLEEP_INTERVAL);
++		sensorConfig.setParameter(MotionSensorConfig.SAMPLING_DELAY, DEFAULT_SAMPLING_DELAY);
++		sensorConfig.setParameter(PullSensorConfig.SENSE_WINDOW_LENGTH_MILLIS, DEFAULT_SAMPLING_WINDOW_SIZE_MILLIS);
++		return sensorConfig;
++	}
++}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/data/pullsensor/AbstractContentReaderListData.java ../SensorManager/src/com/ubhave/sensormanager/data/pullsensor/AbstractContentReaderListData.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/data/pullsensor/AbstractContentReaderListData.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/data/pullsensor/AbstractContentReaderListData.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,11 +22,11 @@
+ 
+ package com.ubhave.sensormanager.data.pullsensor;
+ 
++import java.util.ArrayList;
++
+ import com.ubhave.sensormanager.config.SensorConfig;
+ import com.ubhave.sensormanager.data.SensorData;
+ 
+-import java.util.ArrayList;
+-
+ public abstract class AbstractContentReaderListData extends SensorData
+ {
+ 	private final ArrayList<AbstractContentReaderEntry> contentList;
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/data/pullsensor/AccelerometerData.java ../SensorManager/src/com/ubhave/sensormanager/data/pullsensor/AccelerometerData.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/data/pullsensor/AccelerometerData.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/data/pullsensor/AccelerometerData.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,12 +22,12 @@
+ 
+ package com.ubhave.sensormanager.data.pullsensor;
+ 
++import java.util.ArrayList;
++
+ import com.ubhave.sensormanager.config.SensorConfig;
+ import com.ubhave.sensormanager.data.SensorData;
+ import com.ubhave.sensormanager.sensors.SensorUtils;
+ 
+-import java.util.ArrayList;
+-
+ public class AccelerometerData extends SensorData
+ {
+ 	private ArrayList<float[]> sensorReadings;
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/data/pullsensor/ApplicationDataList.java ../SensorManager/src/com/ubhave/sensormanager/data/pullsensor/ApplicationDataList.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/data/pullsensor/ApplicationDataList.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/data/pullsensor/ApplicationDataList.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,12 +22,12 @@
+ 
+ package com.ubhave.sensormanager.data.pullsensor;
+ 
++import java.util.ArrayList;
++
+ import com.ubhave.sensormanager.config.SensorConfig;
+ import com.ubhave.sensormanager.data.SensorData;
+ import com.ubhave.sensormanager.sensors.SensorUtils;
+ 
+-import java.util.ArrayList;
+-
+ public class ApplicationDataList extends SensorData
+ {
+ 	private ArrayList<ApplicationData> applications;
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/data/pullsensor/BluetoothData.java ../SensorManager/src/com/ubhave/sensormanager/data/pullsensor/BluetoothData.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/data/pullsensor/BluetoothData.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/data/pullsensor/BluetoothData.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,12 +22,12 @@
+ 
+ package com.ubhave.sensormanager.data.pullsensor;
+ 
++import java.util.ArrayList;
++
+ import com.ubhave.sensormanager.config.SensorConfig;
+ import com.ubhave.sensormanager.data.SensorData;
+ import com.ubhave.sensormanager.sensors.SensorUtils;
+ 
+-import java.util.ArrayList;
+-
+ public class BluetoothData extends SensorData
+ {
+ 	private ArrayList<ESBluetoothDevice> bluetoothDevices;
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/data/pullsensor/GyroscopeData.java ../SensorManager/src/com/ubhave/sensormanager/data/pullsensor/GyroscopeData.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/data/pullsensor/GyroscopeData.java	1969-12-31 17:00:00.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/data/pullsensor/GyroscopeData.java	2014-06-11 22:20:22.000000000 -0700
+@@ -0,0 +1,63 @@
++/* **************************************************
++ Copyright (c) 2014
++
++This library was developed as part of the EPSRC Ubhave (Ubiquitous and
++Social Computing for Positive Behaviour Change) Project. For more
++information, please visit http://www.emotionsense.org
++
++Permission to use, copy, modify, and/or distribute this software for any
++purpose with or without fee is hereby granted, provided that the above
++copyright notice and this permission notice appear in all copies.
++
++THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
++WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
++MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
++SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
++IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ ************************************************** */
++
++package com.ubhave.sensormanager.data.pullsensor;
++
++import com.ubhave.sensormanager.config.SensorConfig;
++import com.ubhave.sensormanager.data.SensorData;
++import com.ubhave.sensormanager.sensors.SensorUtils;
++
++import java.util.ArrayList;
++
++public class GyroscopeData extends SensorData
++{
++	private ArrayList<float[]> sensorReadings;
++	private ArrayList<Long> sensorReadingTimestamps;
++
++	public GyroscopeData(long senseStartTimestamp, SensorConfig sensorConfig)
++	{
++		super(senseStartTimestamp, sensorConfig);
++	}
++	
++	public void setSensorReadings(ArrayList<float[]> sensorReadings)
++	{
++		this.sensorReadings = sensorReadings;
++	}
++
++	public ArrayList<float[]> getSensorReadings()
++	{
++		return sensorReadings;
++	}
++	
++	public void setSensorReadingTimestamps(ArrayList<Long> sensorReadingTimestamps)
++	{
++		this.sensorReadingTimestamps = sensorReadingTimestamps;
++	}
++	
++	public ArrayList<Long> getSensorReadingTimestamps()
++	{
++		return sensorReadingTimestamps;
++	}
++
++	public int getSensorType()
++	{
++		return SensorUtils.SENSOR_TYPE_GYROSCOPE;
++	}
++}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/data/pullsensor/WifiData.java ../SensorManager/src/com/ubhave/sensormanager/data/pullsensor/WifiData.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/data/pullsensor/WifiData.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/data/pullsensor/WifiData.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,12 +22,12 @@
+ 
+ package com.ubhave.sensormanager.data.pullsensor;
+ 
++import java.util.ArrayList;
++
+ import com.ubhave.sensormanager.config.SensorConfig;
+ import com.ubhave.sensormanager.data.SensorData;
+ import com.ubhave.sensormanager.sensors.SensorUtils;
+ 
+-import java.util.ArrayList;
+-
+ public class WifiData extends SensorData
+ {
+ 
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/data/pushsensor/LightData.java ../SensorManager/src/com/ubhave/sensormanager/data/pushsensor/LightData.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/data/pushsensor/LightData.java	1969-12-31 17:00:00.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/data/pushsensor/LightData.java	2014-06-11 22:20:22.000000000 -0700
+@@ -0,0 +1,61 @@
++/* **************************************************
++ Copyright (c) 2014
++
++This library was developed as part of the EPSRC Ubhave (Ubiquitous and
++Social Computing for Positive Behaviour Change) Project. For more
++information, please visit http://www.emotionsense.org
++
++Permission to use, copy, modify, and/or distribute this software for any
++purpose with or without fee is hereby granted, provided that the above
++copyright notice and this permission notice appear in all copies.
++
++THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
++WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
++MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
++SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
++IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ ************************************************** */
++
++package com.ubhave.sensormanager.data.pushsensor;
++
++import com.ubhave.sensormanager.config.SensorConfig;
++import com.ubhave.sensormanager.data.SensorData;
++import com.ubhave.sensormanager.sensors.SensorUtils;
++
++public class LightData extends SensorData
++{
++	private float light;
++	private float maxRange;
++
++	public LightData(long recvTimestamp, SensorConfig sensorConfig)
++	{
++		super(recvTimestamp, sensorConfig);
++	}
++
++	public void setLight(float l)
++	{
++		light = l;
++	}
++
++	public float getLight()
++	{
++		return light;
++	}
++
++	public void setMaxRange(float f)
++	{
++		maxRange = f;
++	}
++
++	public float getMaxRange()
++	{
++		return maxRange;
++	}
++
++	public int getSensorType()
++	{
++		return SensorUtils.SENSOR_TYPE_LIGHT;
++	}
++}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/data/pushsensor/SmsData.java ../SensorManager/src/com/ubhave/sensormanager/data/pushsensor/SmsData.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/data/pushsensor/SmsData.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/data/pushsensor/SmsData.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,12 +22,12 @@
+ 
+ package com.ubhave.sensormanager.data.pushsensor;
+ 
++import java.util.HashMap;
++
+ import com.ubhave.sensormanager.config.SensorConfig;
+ import com.ubhave.sensormanager.data.SensorData;
+ import com.ubhave.sensormanager.sensors.SensorUtils;
+ 
+-import java.util.HashMap;
+-
+ public class SmsData extends SensorData
+ {
+ 	public static final String SMS_RECEIVED = "SMSReceived";
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/device/DeviceInfo.java ../SensorManager/src/com/ubhave/sensormanager/device/DeviceInfo.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/device/DeviceInfo.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/device/DeviceInfo.java	1969-12-31 17:00:00.000000000 -0700
+@@ -1,57 +0,0 @@
+-/* **************************************************
+- Copyright (c) 2012, University of Cambridge
+- Neal Lathia, neal.lathia@cl.cam.ac.uk
+- Kiran Rachuri, kiran.rachuri@cl.cam.ac.uk
+-
+-This library was developed as part of the EPSRC Ubhave (Ubiquitous and
+-Social Computing for Positive Behaviour Change) Project. For more
+-information, please visit http://www.emotionsense.org
+-
+-Permission to use, copy, modify, and/or distribute this software for any
+-purpose with or without fee is hereby granted, provided that the above
+-copyright notice and this permission notice appear in all copies.
+-
+-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+-SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+-IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+- ************************************************** */
+-
+-package com.ubhave.sensormanager.device;
+-
+-import android.os.Build;
+-
+-import java.util.TimeZone;
+-
+-public class DeviceInfo
+-{
+-	public static String getDeviceDetails()
+-	{
+-		StringBuilder sb = new StringBuilder();
+-
+-		sb.append("BOOTLOADER: " + Build.BOOTLOADER + ";");
+-		sb.append("BRAND: " + Build.BRAND + ";");
+-		sb.append("DEVICE: " + Build.DEVICE + ";");
+-		sb.append("DISPLAY: " + Build.DISPLAY + ";");
+-		sb.append("MANUFACTURER: " + Build.MANUFACTURER + ";");
+-		sb.append("MODEL: " + Build.MODEL + ";");
+-		sb.append("PRODUCT: " + Build.PRODUCT + ";");
+-		sb.append("RADIO: " + Build.RADIO + ";");
+-		sb.append("VERSION.CODENAME: " + Build.VERSION.CODENAME + ";");
+-		
+-		return sb.toString();
+-	}
+-	
+-	public static String getTimeZoneId()
+-	{
+-		return TimeZone.getDefault().getID();
+-	}
+-	
+-	public static String getTimeZoneDisplayName()
+-	{
+-		return TimeZone.getDefault().getDisplayName();
+-	}
+-}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/process/AbstractProcessor.java ../SensorManager/src/com/ubhave/sensormanager/process/AbstractProcessor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/process/AbstractProcessor.java	2014-06-09 23:15:40.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/process/AbstractProcessor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -8,22 +8,20 @@
+ import com.ubhave.sensormanager.process.pull.BluetoothProcessor;
+ import com.ubhave.sensormanager.process.pull.CallContentReaderProcessor;
+ import com.ubhave.sensormanager.process.pull.CameraProcessor;
++import com.ubhave.sensormanager.process.pull.GyroscopeProcessor;
+ import com.ubhave.sensormanager.process.pull.LocationProcessor;
+ import com.ubhave.sensormanager.process.pull.MicrophoneProcessor;
+ import com.ubhave.sensormanager.process.pull.SMSContentReaderProcessor;
+ import com.ubhave.sensormanager.process.pull.WifiProcessor;
+ import com.ubhave.sensormanager.process.push.BatteryProcessor;
+ import com.ubhave.sensormanager.process.push.ConnectionStateProcessor;
++import com.ubhave.sensormanager.process.push.LightProcessor;
+ import com.ubhave.sensormanager.process.push.PhoneStateProcessor;
+ import com.ubhave.sensormanager.process.push.ProximityProcessor;
+ import com.ubhave.sensormanager.process.push.SMSProcessor;
+ import com.ubhave.sensormanager.process.push.ScreenProcessor;
+ import com.ubhave.sensormanager.sensors.SensorUtils;
+ 
+-import edu.arizona.adherence.sensormanager.process.GyroscopeProcessor;
+-import edu.arizona.adherence.sensormanager.process.LightProcessor;
+-import edu.arizona.adherence.sensormanager.process.ZephyrProcessor;
+-
+ public abstract class AbstractProcessor
+ {
+ 	public static AbstractProcessor getProcessor(Context c, int sensorType, boolean setRawData, boolean setProcessedData) throws ESException
+@@ -65,12 +63,10 @@
+ 			return new SMSContentReaderProcessor(c, setRawData, setProcessedData);
+ 		case SensorUtils.SENSOR_TYPE_CAMERA:
+ 			return new CameraProcessor(c, setRawData, setProcessedData);
+-        case SensorUtils.SENSOR_TYPE_ZEPHYR:
+-            return new ZephyrProcessor(c, setRawData, setProcessedData);
+-        case SensorUtils.SENSOR_TYPE_LIGHT:
+-            return new LightProcessor(c, setRawData, setProcessedData);
+         case SensorUtils.SENSOR_TYPE_GYROSCOPE:
+             return new GyroscopeProcessor(c, setRawData, setProcessedData);
++		case SensorUtils.SENSOR_TYPE_LIGHT:
++			return new LightProcessor(c, setRawData, setProcessedData);
+ 		default:
+ 			throw new ESException(ESException.UNKNOWN_SENSOR_TYPE, "No processor defined for this sensor.");
+ 		}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/process/CommunicationProcessor.java ../SensorManager/src/com/ubhave/sensormanager/process/CommunicationProcessor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/process/CommunicationProcessor.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/process/CommunicationProcessor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -1,11 +1,11 @@
+ package com.ubhave.sensormanager.process;
+ 
+-import android.content.Context;
+-
+ import java.security.MessageDigest;
+ import java.security.NoSuchAlgorithmException;
+ import java.util.Locale;
+ 
++import android.content.Context;
++
+ public abstract class CommunicationProcessor extends AbstractProcessor
+ {
+ 	public CommunicationProcessor(Context c, boolean rw, boolean sp)
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/process/pull/AccelerometerProcessor.java ../SensorManager/src/com/ubhave/sensormanager/process/pull/AccelerometerProcessor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/process/pull/AccelerometerProcessor.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/process/pull/AccelerometerProcessor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -1,13 +1,13 @@
+ package com.ubhave.sensormanager.process.pull;
+ 
++import java.util.ArrayList;
++
+ import android.content.Context;
+ 
+ import com.ubhave.sensormanager.config.SensorConfig;
+ import com.ubhave.sensormanager.data.pullsensor.AccelerometerData;
+ import com.ubhave.sensormanager.process.AbstractProcessor;
+ 
+-import java.util.ArrayList;
+-
+ public class AccelerometerProcessor extends AbstractProcessor
+ {
+ 	public AccelerometerProcessor(final Context c, boolean rw, boolean sp)
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/process/pull/ApplicationProcessor.java ../SensorManager/src/com/ubhave/sensormanager/process/pull/ApplicationProcessor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/process/pull/ApplicationProcessor.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/process/pull/ApplicationProcessor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -1,5 +1,7 @@
+ package com.ubhave.sensormanager.process.pull;
+ 
++import java.util.ArrayList;
++
+ import android.content.Context;
+ 
+ import com.ubhave.sensormanager.config.SensorConfig;
+@@ -7,8 +9,6 @@
+ import com.ubhave.sensormanager.data.pullsensor.ApplicationDataList;
+ import com.ubhave.sensormanager.process.AbstractProcessor;
+ 
+-import java.util.ArrayList;
+-
+ public class ApplicationProcessor extends AbstractProcessor
+ {
+ 	public ApplicationProcessor(final Context c, boolean rw, boolean sp)
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/process/pull/BluetoothProcessor.java ../SensorManager/src/com/ubhave/sensormanager/process/pull/BluetoothProcessor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/process/pull/BluetoothProcessor.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/process/pull/BluetoothProcessor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -1,5 +1,7 @@
+ package com.ubhave.sensormanager.process.pull;
+ 
++import java.util.ArrayList;
++
+ import android.content.Context;
+ 
+ import com.ubhave.sensormanager.config.SensorConfig;
+@@ -7,8 +9,6 @@
+ import com.ubhave.sensormanager.data.pullsensor.ESBluetoothDevice;
+ import com.ubhave.sensormanager.process.AbstractProcessor;
+ 
+-import java.util.ArrayList;
+-
+ public class BluetoothProcessor extends AbstractProcessor
+ {
+ 	public BluetoothProcessor(final Context c, boolean rw, boolean sp)
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/process/pull/CallContentReaderProcessor.java ../SensorManager/src/com/ubhave/sensormanager/process/pull/CallContentReaderProcessor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/process/pull/CallContentReaderProcessor.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/process/pull/CallContentReaderProcessor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -1,5 +1,8 @@
+ package com.ubhave.sensormanager.process.pull;
+ 
++import java.util.HashMap;
++import java.util.Iterator;
++
+ import android.content.Context;
+ import android.provider.CallLog;
+ 
+@@ -10,9 +13,6 @@
+ import com.ubhave.sensormanager.data.pullsensor.CallContentListData;
+ import com.ubhave.sensormanager.data.pullsensor.CallContentReaderEntry;
+ 
+-import java.util.HashMap;
+-import java.util.Iterator;
+-
+ public class CallContentReaderProcessor extends ContentReaderProcessor
+ {
+ 	private final static String OUTGOING = "outgoing"; // CallLog.Calls.OUTGOING_TYPE
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/process/pull/ContentReaderProcessor.java ../SensorManager/src/com/ubhave/sensormanager/process/pull/ContentReaderProcessor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/process/pull/ContentReaderProcessor.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/process/pull/ContentReaderProcessor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -1,15 +1,15 @@
+ package com.ubhave.sensormanager.process.pull;
+ 
++import java.util.ArrayList;
++import java.util.HashMap;
++
+ import android.content.Context;
+ 
+ import com.ubhave.sensormanager.config.SensorConfig;
+-import com.ubhave.sensormanager.data.pullsensor.AbstractContentReaderEntry;
+ import com.ubhave.sensormanager.data.pullsensor.AbstractContentReaderListData;
++import com.ubhave.sensormanager.data.pullsensor.AbstractContentReaderEntry;
+ import com.ubhave.sensormanager.process.CommunicationProcessor;
+ 
+-import java.util.ArrayList;
+-import java.util.HashMap;
+-
+ public abstract class ContentReaderProcessor extends CommunicationProcessor
+ {
+ 	public ContentReaderProcessor(final Context c, boolean rw, boolean sp)
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/process/pull/GyroscopeProcessor.java ../SensorManager/src/com/ubhave/sensormanager/process/pull/GyroscopeProcessor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/process/pull/GyroscopeProcessor.java	1969-12-31 17:00:00.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/process/pull/GyroscopeProcessor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -0,0 +1,29 @@
++package com.ubhave.sensormanager.process.pull;
++
++import java.util.ArrayList;
++
++import android.content.Context;
++
++import com.ubhave.sensormanager.config.SensorConfig;
++import com.ubhave.sensormanager.data.pullsensor.GyroscopeData;
++import com.ubhave.sensormanager.process.AbstractProcessor;
++
++public class GyroscopeProcessor extends AbstractProcessor
++{
++	public GyroscopeProcessor(final Context c, boolean rw, boolean sp)
++	{
++		super(c, rw, sp);
++	}
++
++	public GyroscopeData process(long pullSenseStartTimestamp, ArrayList<float[]> sensorReadings,
++			ArrayList<Long> sensorReadingTimestamps, SensorConfig sensorConfig)
++	{
++		GyroscopeData gyroscopeData = new GyroscopeData(pullSenseStartTimestamp, sensorConfig);
++		if (setRawData)
++		{
++            gyroscopeData.setSensorReadings(sensorReadings);
++            gyroscopeData.setSensorReadingTimestamps(sensorReadingTimestamps);
++		}
++        return gyroscopeData;
++	}
++}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/process/pull/SMSContentReaderProcessor.java ../SensorManager/src/com/ubhave/sensormanager/process/pull/SMSContentReaderProcessor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/process/pull/SMSContentReaderProcessor.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/process/pull/SMSContentReaderProcessor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -1,5 +1,8 @@
+ package com.ubhave.sensormanager.process.pull;
+ 
++import java.util.HashMap;
++import java.util.Iterator;
++
+ import android.content.Context;
+ 
+ import com.ubhave.sensormanager.config.SensorConfig;
+@@ -9,9 +12,6 @@
+ import com.ubhave.sensormanager.data.pullsensor.SMSContentListData;
+ import com.ubhave.sensormanager.data.pullsensor.SMSContentReaderEntry;
+ 
+-import java.util.HashMap;
+-import java.util.Iterator;
+-
+ public class SMSContentReaderProcessor extends ContentReaderProcessor
+ {
+ 	private static final String MESSAGE_TYPE_ALL    = "all";
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/process/pull/WifiProcessor.java ../SensorManager/src/com/ubhave/sensormanager/process/pull/WifiProcessor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/process/pull/WifiProcessor.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/process/pull/WifiProcessor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -1,5 +1,7 @@
+ package com.ubhave.sensormanager.process.pull;
+ 
++import java.util.ArrayList;
++
+ import android.content.Context;
+ 
+ import com.ubhave.sensormanager.config.SensorConfig;
+@@ -7,8 +9,6 @@
+ import com.ubhave.sensormanager.data.pullsensor.WifiScanResult;
+ import com.ubhave.sensormanager.process.AbstractProcessor;
+ 
+-import java.util.ArrayList;
+-
+ public class WifiProcessor extends AbstractProcessor
+ {
+ 	public WifiProcessor(final Context c, boolean rw, boolean sp)
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/process/push/LightProcessor.java ../SensorManager/src/com/ubhave/sensormanager/process/push/LightProcessor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/process/push/LightProcessor.java	1969-12-31 17:00:00.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/process/push/LightProcessor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -0,0 +1,26 @@
++package com.ubhave.sensormanager.process.push;
++
++import android.content.Context;
++
++import com.ubhave.sensormanager.config.SensorConfig;
++import com.ubhave.sensormanager.data.pushsensor.LightData;
++import com.ubhave.sensormanager.process.AbstractProcessor;
++
++public class LightProcessor extends AbstractProcessor
++{
++	public LightProcessor(final Context c, boolean rw, boolean sp)
++	{
++		super(c, rw, sp);
++	}
++
++	public LightData process(long recvTime, SensorConfig config, float light, float maxRange)
++	{
++        LightData data = new LightData(recvTime, config);
++		if (setRawData)
++		{
++            data.setLight(light);
++			data.setMaxRange(maxRange);
++		}
++		return data;
++	}
++}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/process/push/SMSProcessor.java ../SensorManager/src/com/ubhave/sensormanager/process/push/SMSProcessor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/process/push/SMSProcessor.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/process/push/SMSProcessor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -1,16 +1,16 @@
+ package com.ubhave.sensormanager.process.push;
+ 
++import java.io.BufferedReader;
++import java.io.InputStreamReader;
++import java.util.ArrayList;
++import java.util.HashMap;
++
+ import android.content.Context;
+ 
+ import com.ubhave.sensormanager.config.SensorConfig;
+ import com.ubhave.sensormanager.data.pushsensor.SmsData;
+ import com.ubhave.sensormanager.process.CommunicationProcessor;
+ 
+-import java.io.BufferedReader;
+-import java.io.InputStreamReader;
+-import java.util.ArrayList;
+-import java.util.HashMap;
+-
+ public class SMSProcessor extends CommunicationProcessor
+ {
+ 	/*
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/SensorUtils.java ../SensorManager/src/com/ubhave/sensormanager/sensors/SensorUtils.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/SensorUtils.java	2014-06-09 23:13:03.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/SensorUtils.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,6 +22,8 @@
+ 
+ package com.ubhave.sensormanager.sensors;
+ 
++import java.util.ArrayList;
++
+ import android.content.Context;
+ import android.util.Log;
+ 
+@@ -34,13 +36,13 @@
+ import com.ubhave.sensormanager.classifier.WifiDataClassifier;
+ import com.ubhave.sensormanager.config.GlobalConfig;
+ import com.ubhave.sensormanager.config.SensorConfig;
+-import com.ubhave.sensormanager.config.sensors.pull.AccelerometerConfig;
+ import com.ubhave.sensormanager.config.sensors.pull.ApplicationConfig;
+ import com.ubhave.sensormanager.config.sensors.pull.BluetoothConfig;
+ import com.ubhave.sensormanager.config.sensors.pull.CameraConfig;
+ import com.ubhave.sensormanager.config.sensors.pull.ContentReaderConfig;
+ import com.ubhave.sensormanager.config.sensors.pull.LocationConfig;
+ import com.ubhave.sensormanager.config.sensors.pull.MicrophoneConfig;
++import com.ubhave.sensormanager.config.sensors.pull.MotionSensorConfig;
+ import com.ubhave.sensormanager.config.sensors.pull.PullSensorConfig;
+ import com.ubhave.sensormanager.config.sensors.pull.WifiConfig;
+ import com.ubhave.sensormanager.sensors.pull.AccelerometerSensor;
+@@ -48,24 +50,19 @@
+ import com.ubhave.sensormanager.sensors.pull.BluetoothSensor;
+ import com.ubhave.sensormanager.sensors.pull.CallContentReaderSensor;
+ import com.ubhave.sensormanager.sensors.pull.CameraSensor;
++import com.ubhave.sensormanager.sensors.pull.GyroscopeSensor;
+ import com.ubhave.sensormanager.sensors.pull.LocationSensor;
+ import com.ubhave.sensormanager.sensors.pull.MicrophoneSensor;
+ import com.ubhave.sensormanager.sensors.pull.SMSContentReaderSensor;
+ import com.ubhave.sensormanager.sensors.pull.WifiSensor;
+ import com.ubhave.sensormanager.sensors.push.BatterySensor;
+ import com.ubhave.sensormanager.sensors.push.ConnectionStateSensor;
++import com.ubhave.sensormanager.sensors.push.LightSensor;
+ import com.ubhave.sensormanager.sensors.push.PhoneStateSensor;
+ import com.ubhave.sensormanager.sensors.push.ProximitySensor;
+ import com.ubhave.sensormanager.sensors.push.ScreenSensor;
+ import com.ubhave.sensormanager.sensors.push.SmsSensor;
+ 
+-import java.util.ArrayList;
+-
+-import edu.arizona.adherence.sensormanager.config.GyroscopeConfig;
+-import edu.arizona.adherence.sensormanager.sensors.GyroscopeSensor;
+-import edu.arizona.adherence.sensormanager.sensors.LightSensor;
+-import edu.arizona.adherence.sensormanager.sensors.ZephyrSensor;
+-
+ public class SensorUtils
+ {
+ 	private static String TAG = "SensorUtils";
+@@ -85,11 +82,8 @@
+ 	public final static int SENSOR_TYPE_SMS_CONTENT_READER = 5013;
+ 	public final static int SENSOR_TYPE_CALL_CONTENT_READER = 5014;
+ 	public final static int SENSOR_TYPE_CAMERA = 5015;
+-
+-    // Zephyr Sensor
+-    public final static int SENSOR_TYPE_ZEPHYR = 5101;
+-    public final static int SENSOR_TYPE_LIGHT = 5102;
+-    public final static int SENSOR_TYPE_GYROSCOPE = 5103;
++	public final static int SENSOR_TYPE_GYROSCOPE = 5016;
++	public final static int SENSOR_TYPE_LIGHT = 5017;
+ 
+     public final static String SENSOR_NAME_ACCELEROMETER = "Accelerometer";
+ 	public final static String SENSOR_NAME_BATTERY = "Battery";
+@@ -106,16 +100,14 @@
+ 	public final static String SENSOR_NAME_SMS_CONTENT_READER = "SMSContentReader";
+ 	public final static String SENSOR_NAME_CALL_CONTENT_READER = "CallContentReader";
+ 	public final static String SENSOR_NAME_CAMERA = "Camera";
+-
+-    public final static String SENSOR_NAME_ZEPHYR = "Zephyr";
+-    public final static String SENSOR_NAME_LIGHT = "Light";
+     public final static String SENSOR_NAME_GYROSCOPE = "Gyroscope";
++	public final static String SENSOR_NAME_LIGHT = "Light";
+ 
+ 	public final static int[] ALL_SENSORS = new int[] { SENSOR_TYPE_ACCELEROMETER, SENSOR_TYPE_BLUETOOTH,
+ 			SENSOR_TYPE_LOCATION, SENSOR_TYPE_MICROPHONE, SENSOR_TYPE_WIFI, SENSOR_TYPE_BATTERY, SENSOR_TYPE_PHONE_STATE,
+ 			SENSOR_TYPE_PROXIMITY, SENSOR_TYPE_SCREEN, SENSOR_TYPE_SMS, SENSOR_TYPE_CONNECTION_STATE,
+ 			SENSOR_TYPE_APPLICATION, SENSOR_TYPE_SMS_CONTENT_READER, SENSOR_TYPE_CALL_CONTENT_READER,  SENSOR_TYPE_CAMERA,
+-            SENSOR_TYPE_ZEPHYR, SENSOR_TYPE_LIGHT, SENSOR_TYPE_GYROSCOPE};
++			SENSOR_TYPE_GYROSCOPE, SENSOR_TYPE_LIGHT };
+ 
+ 	public static boolean isPullSensor(int sensorType)
+ 	{
+@@ -130,7 +122,6 @@
+ 		case SENSOR_TYPE_SMS_CONTENT_READER:
+ 		case SENSOR_TYPE_CALL_CONTENT_READER:
+ 		case SENSOR_TYPE_CAMERA:
+-        //case SENSOR_TYPE_ZEPHYR:
+         case SENSOR_TYPE_GYROSCOPE:
+ 			return true;
+ 		default:
+@@ -203,12 +194,10 @@
+ 			return CallContentReaderSensor.getCallContentReaderSensor(context);
+ 		case SENSOR_TYPE_CAMERA:
+ 			return CameraSensor.getCameraSensor(context);
+-        case SENSOR_TYPE_ZEPHYR:
+-            return ZephyrSensor.getZephyrSensor(context);
+-        case SENSOR_TYPE_LIGHT:
+-            return LightSensor.getLightSensor(context);
+         case SENSOR_TYPE_GYROSCOPE:
+             return GyroscopeSensor.getGyroscopeSensor(context);
++		case SENSOR_TYPE_LIGHT:
++			return LightSensor.getLightSensor(context);
+ 		default:
+ 			throw new ESException(ESException.UNKNOWN_SENSOR_TYPE, "Unknown sensor id: "+id);
+ 		}
+@@ -220,7 +209,7 @@
+ 		switch (sensorType)
+ 		{
+ 		case SensorUtils.SENSOR_TYPE_ACCELEROMETER:
+-			sensorConfig = AccelerometerConfig.getDefault();
++			sensorConfig = MotionSensorConfig.getDefault();
+ 			break;
+ 		case SensorUtils.SENSOR_TYPE_BLUETOOTH:
+ 			sensorConfig =  BluetoothConfig.getDefault();
+@@ -245,7 +234,7 @@
+ 			sensorConfig = CameraConfig.getDefault();
+ 			break;
+         case SensorUtils.SENSOR_TYPE_GYROSCOPE:
+-            sensorConfig = GyroscopeConfig.getDefault();
++            sensorConfig = MotionSensorConfig.getDefault();
+             break;
+ 		}
+ 		sensorConfig.setParameter(PullSensorConfig.ADAPTIVE_SENSING_ENABLED, false);
+@@ -310,18 +299,14 @@
+ 		{
+ 			return SENSOR_TYPE_CAMERA;
+ 		}
+-        else if (sensorName.equals(SENSOR_NAME_ZEPHYR))
++		else if (sensorName.equals(SENSOR_NAME_GYROSCOPE))
+         {
+-            return SENSOR_TYPE_ZEPHYR;
++			return SENSOR_TYPE_GYROSCOPE;
+         }
+         else if (sensorName.equals(SENSOR_NAME_LIGHT))
+         {
+             return SENSOR_TYPE_LIGHT;
+         }
+-        else if (sensorName.equals(SENSOR_NAME_GYROSCOPE))
+-        {
+-            return SENSOR_TYPE_GYROSCOPE;
+-        }
+ 		else
+ 		{
+ 			throw new ESException(ESException.UNKNOWN_SENSOR_NAME, "unknown sensor name " + sensorName);
+@@ -362,12 +347,10 @@
+ 			return SENSOR_NAME_CALL_CONTENT_READER;
+ 		case SensorUtils.SENSOR_TYPE_CAMERA:
+ 			return SENSOR_NAME_CAMERA;
+-        case SensorUtils.SENSOR_TYPE_ZEPHYR:
+-            return SENSOR_NAME_ZEPHYR;
+-        case SensorUtils.SENSOR_TYPE_LIGHT:
+-            return SENSOR_NAME_LIGHT;
+         case SensorUtils.SENSOR_TYPE_GYROSCOPE:
+             return SENSOR_NAME_GYROSCOPE;
++		case SensorUtils.SENSOR_TYPE_LIGHT:
++			return SENSOR_NAME_LIGHT;
+ 		default:
+ 			throw new ESException(ESException.UNKNOWN_SENSOR_NAME, "unknown sensor type " + sensorType);
+ 		}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/AbstractContentReaderSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/AbstractContentReaderSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/AbstractContentReaderSensor.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/AbstractContentReaderSensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,6 +22,9 @@
+ 
+ package com.ubhave.sensormanager.sensors.pull;
+ 
++import java.util.ArrayList;
++import java.util.HashMap;
++
+ import android.content.ContentResolver;
+ import android.content.Context;
+ import android.database.Cursor;
+@@ -32,9 +35,6 @@
+ import com.ubhave.sensormanager.data.SensorData;
+ import com.ubhave.sensormanager.process.pull.ContentReaderProcessor;
+ 
+-import java.util.ArrayList;
+-import java.util.HashMap;
+-
+ public abstract class AbstractContentReaderSensor extends AbstractPullSensor
+ {
+ 	protected ArrayList<HashMap<String, String>> contentList;
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/AbstractMediaSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/AbstractMediaSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/AbstractMediaSensor.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/AbstractMediaSensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,11 +22,11 @@
+ 
+ package com.ubhave.sensormanager.sensors.pull;
+ 
++import java.io.File;
++
+ import android.content.Context;
+ import android.util.Log;
+ 
+-import java.io.File;
+-
+ public abstract class AbstractMediaSensor extends AbstractPullSensor
+ {
+ 	protected AbstractMediaSensor(Context context)
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/AbstractMotionSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/AbstractMotionSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/AbstractMotionSensor.java	1969-12-31 17:00:00.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/AbstractMotionSensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -0,0 +1,108 @@
++/* **************************************************
++ Copyright (c) 2012, University of Cambridge
++ Neal Lathia, neal.lathia@cl.cam.ac.uk
++ Kiran Rachuri, kiran.rachuri@cl.cam.ac.uk
++
++This library was developed as part of the EPSRC Ubhave (Ubiquitous and
++Social Computing for Positive Behaviour Change) Project. For more
++information, please visit http://www.emotionsense.org
++
++Permission to use, copy, modify, and/or distribute this software for any
++purpose with or without fee is hereby granted, provided that the above
++copyright notice and this permission notice appear in all copies.
++
++THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
++WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
++MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
++SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
++IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ ************************************************** */
++
++package com.ubhave.sensormanager.sensors.pull;
++
++import java.util.ArrayList;
++
++import android.content.Context;
++import android.hardware.Sensor;
++import android.hardware.SensorEvent;
++import android.hardware.SensorEventListener;
++import android.hardware.SensorManager;
++
++import com.ubhave.sensormanager.config.sensors.pull.MotionSensorConfig;
++
++public abstract class AbstractMotionSensor extends AbstractPullSensor
++{	
++	private final int motionSensorType;
++	private final SensorEventListener listener; // data listener
++	private final SensorManager sensorManager; // Controls the hardware sensor
++	
++	protected ArrayList<float[]> sensorReadings;
++	protected ArrayList<Long> sensorReadingTimestamps;
++
++	protected AbstractMotionSensor(final Context context, final int motionSensorType)
++	{
++		super(context);
++		this.motionSensorType = motionSensorType;
++		sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
++		listener = new SensorEventListener()
++		{
++
++			// This method is required by the API and is called when the
++			// accuracy of the
++			// readings being generated by the accelerometer changes.
++			// We don't do anything when this happens.
++			public void onAccuracyChanged(Sensor sensor, int accuracy)
++			{
++			}
++
++			// This method is called when the accelerometer takes a reading:
++			// despite the name, it is called whether even if it's the same as
++			// the previous one
++			public void onSensorChanged(SensorEvent event)
++			{
++				try
++				{
++					if (isSensing)
++					{
++						synchronized (sensorReadings)
++						{
++							if (isSensing)
++							{
++								float[] data = new float[3];
++
++								for (int i = 0; i < 3; i++)
++								{
++									data[i] = event.values[i];
++								}
++
++								sensorReadings.add(data);
++								sensorReadingTimestamps.add(System.currentTimeMillis());
++							}
++						}
++					}
++				}
++				catch (Exception e)
++				{
++					e.printStackTrace();
++				}
++			}
++		};
++	}
++
++	protected boolean startSensing()
++	{
++		sensorReadings = new ArrayList<float[]>();
++		sensorReadingTimestamps = new ArrayList<Long>();
++
++		int sensorDelay = (Integer) sensorConfig.getParameter(MotionSensorConfig.SAMPLING_DELAY);
++		boolean registrationSuccess = sensorManager.registerListener(listener, sensorManager.getDefaultSensor(motionSensorType), sensorDelay);
++		return registrationSuccess;
++	}
++
++	protected void stopSensing()
++	{
++		sensorManager.unregisterListener(listener);
++	}
++}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/AccelerometerSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/AccelerometerSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/AccelerometerSensor.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/AccelerometerSensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -24,28 +24,16 @@
+ 
+ import android.content.Context;
+ import android.hardware.Sensor;
+-import android.hardware.SensorEvent;
+-import android.hardware.SensorEventListener;
+-import android.hardware.SensorManager;
+ 
+-import com.ubhave.sensormanager.config.sensors.pull.AccelerometerConfig;
+ import com.ubhave.sensormanager.data.pullsensor.AccelerometerData;
+ import com.ubhave.sensormanager.process.pull.AccelerometerProcessor;
+ import com.ubhave.sensormanager.sensors.SensorUtils;
+ 
+-import java.util.ArrayList;
+-
+-public class AccelerometerSensor extends AbstractPullSensor
++public class AccelerometerSensor extends AbstractMotionSensor
+ {
+ 	private static final String TAG = "AccelerometerSensor";
+-
+ 	private static AccelerometerSensor accelerometerSensor;
+ 	private static Object lock = new Object();
+-	
+-	private SensorEventListener listener; // accelerometer data listener
+-	private SensorManager sensorManager; // Controls the hardware sensor
+-	private ArrayList<float[]> sensorReadings;
+-	private ArrayList<Long> sensorReadingTimestamps;
+ 	private AccelerometerData accelerometerData;
+ 
+ 	public static AccelerometerSensor getAccelerometerSensor(Context context)
+@@ -63,53 +51,9 @@
+ 		return accelerometerSensor;
+ 	}
+ 
+-	private AccelerometerSensor(Context context)
+-	{
+-		super(context);
+-		sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+-		listener = new SensorEventListener()
+-		{
+-
+-			// This method is required by the API and is called when the
+-			// accuracy of the
+-			// readings being generated by the accelerometer changes.
+-			// We don't do anything when this happens.
+-			public void onAccuracyChanged(Sensor sensor, int accuracy)
++	private AccelerometerSensor(final Context context)
+ 			{
+-			}
+-
+-			// This method is called when the accelerometer takes a reading:
+-			// despite the name, it is called whether even if it's the same as
+-			// the previous one
+-			public void onSensorChanged(SensorEvent event)
+-			{
+-				try
+-				{
+-					if (isSensing)
+-					{
+-						synchronized (sensorReadings)
+-						{
+-							if (isSensing)
+-							{
+-								float[] data = new float[3];
+-
+-								for (int i = 0; i < 3; i++)
+-								{
+-									data[i] = event.values[i];
+-								}
+-
+-								sensorReadings.add(data);
+-								sensorReadingTimestamps.add(System.currentTimeMillis());
+-							}
+-						}
+-					}
+-				}
+-				catch (Exception e)
+-				{
+-					e.printStackTrace();
+-				}
+-			}
+-		};
++		super(context, Sensor.TYPE_ACCELEROMETER);
+ 	}
+ 
+ 	protected String getLogTag()
+@@ -135,20 +79,4 @@
+ 			accelerometerData = processor.process(pullSenseStartTimestamp, sensorReadings, sensorReadingTimestamps, sensorConfig.clone());
+ 		}
+ 	}
+-
+-	protected boolean startSensing()
+-	{
+-		sensorReadings = new ArrayList<float[]>();
+-		sensorReadingTimestamps = new ArrayList<Long>();
+-
+-		int sensorDelay = (Integer) sensorConfig.getParameter(AccelerometerConfig.SAMPLING_DELAY);
+-		boolean registrationSuccess = sensorManager.registerListener(listener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), sensorDelay);
+-		return registrationSuccess;
+-	}
+-
+-	protected void stopSensing()
+-	{
+-		sensorManager.unregisterListener(listener);
+-	}
+-
+ }
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/ApplicationSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/ApplicationSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/ApplicationSensor.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/ApplicationSensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,6 +22,10 @@
+ 
+ package com.ubhave.sensormanager.sensors.pull;
+ 
++import java.util.ArrayList;
++import java.util.List;
++
++import android.Manifest;
+ import android.app.ActivityManager;
+ import android.app.ActivityManager.RunningTaskInfo;
+ import android.content.ComponentName;
+@@ -37,14 +41,9 @@
+ import com.ubhave.sensormanager.process.pull.ApplicationProcessor;
+ import com.ubhave.sensormanager.sensors.SensorUtils;
+ 
+-import java.util.ArrayList;
+-import java.util.List;
+-
+ public class ApplicationSensor extends AbstractPullSensor
+ {
+ 	private static final String TAG = "ApplicationSensor";
+-	private static final String PERMISSION_TASKS = "android.permission.GET_TASKS";
+-	
+ 	private static ApplicationSensor applicationSensor;
+ 	private static Object lock = new Object();
+ 	
+@@ -59,7 +58,7 @@
+ 			{
+ 				if (applicationSensor == null)
+ 				{
+-					if (permissionGranted(context, PERMISSION_TASKS))
++					if (permissionGranted(context, Manifest.permission.GET_TASKS))
+ 					{
+ 						applicationSensor = new ApplicationSensor(context);
+ 					}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/BluetoothSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/BluetoothSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/BluetoothSensor.java	2014-06-11 08:52:45.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/BluetoothSensor.java	2014-06-11 22:26:33.000000000 -0700
+@@ -22,6 +22,9 @@
+ 
+ package com.ubhave.sensormanager.sensors.pull;
+ 
++import java.util.ArrayList;
++
++import android.Manifest;
+ import android.bluetooth.BluetoothAdapter;
+ import android.bluetooth.BluetoothDevice;
+ import android.content.BroadcastReceiver;
+@@ -38,13 +41,13 @@
+ import com.ubhave.sensormanager.process.pull.BluetoothProcessor;
+ import com.ubhave.sensormanager.sensors.SensorUtils;
+ 
+-import java.util.ArrayList;
+-
+ public class BluetoothSensor extends AbstractPullSensor
+ {
+ 	private static final String TAG = "BluetoothSensor";
+-	private static final String PERMISSION_BLUETOOTH = "android.permission.BLUETOOTH";
+-	private static final String PERMISSION_BT_ADMIN = "android.permission.BLUETOOTH_ADMIN";
++	private static final String[] REQUIRED_PERMISSIONS = new String[]{
++		Manifest.permission.BLUETOOTH,
++		Manifest.permission.BLUETOOTH_ADMIN
++	};
+ 	
+ 	private static BluetoothSensor bluetoothSensor;
+ 	private static Object lock = new Object();
+@@ -53,6 +56,7 @@
+ 	private BluetoothAdapter bluetooth = null;
+ 	private int cyclesRemaining;
+ 	private BluetoothData bluetoothData;
++    private BroadcastReceiver receiver;
+ 
+ 	public static BluetoothSensor getBluetoothSensor(final Context context) throws ESException
+ 	{
+@@ -62,7 +66,7 @@
+ 			{
+ 				if (bluetoothSensor == null)
+ 				{
+-					if (allPermissionsGranted(context, new String[]{PERMISSION_BLUETOOTH, PERMISSION_BT_ADMIN}))
++					if (allPermissionsGranted(context, REQUIRED_PERMISSIONS))
+ 					{
+ 						bluetoothSensor = new BluetoothSensor(context);
+ 					}
+@@ -92,7 +96,7 @@
+ 
+ 		// Create a BroadcastReceiver for ACTION_FOUND, sent when a device is
+ 		// discovered
+-		BroadcastReceiver receiver = new BroadcastReceiver()
++		receiver = new BroadcastReceiver()
+ 		{
+ 
+ 			public void onReceive(Context context, Intent intent)
+@@ -192,8 +196,7 @@
+ 			bluetooth.cancelDiscovery();
+ 			bluetooth.disable();
+ 		}
++        applicationContext.unregisterReceiver(receiver);
+ 	}
+ 
+-
+-
+ }
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/CallContentReaderSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/CallContentReaderSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/CallContentReaderSensor.java	2014-05-30 17:16:10.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/CallContentReaderSensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,6 +22,7 @@
+ 
+ package com.ubhave.sensormanager.sensors.pull;
+ 
++import android.Manifest;
+ import android.content.Context;
+ import android.provider.CallLog;
+ 
+@@ -31,8 +32,6 @@
+ public class CallContentReaderSensor extends AbstractContentReaderSensor
+ {
+ 	private static final String LOG_TAG = "CallContentReaderSensor";
+-	private static final String PERMISSION_READ_CALLS = "android.permission.READ_CALL_LOG";
+-	
+ 	private static CallContentReaderSensor callContentReaderSensor;
+ 
+ 	public static CallContentReaderSensor getCallContentReaderSensor(final Context context) throws ESException
+@@ -43,7 +42,8 @@
+ 			{
+ 				if (callContentReaderSensor == null)
+ 				{
+-					if (permissionGranted(context, PERMISSION_READ_CALLS))
++					if ((android.os.Build.VERSION.SDK_INT <= 15 && permissionGranted(context, Manifest.permission.READ_CONTACTS))
++							|| permissionGranted(context, Manifest.permission.READ_CALL_LOG))
+ 					{
+ 						callContentReaderSensor = new CallContentReaderSensor(context);
+ 					}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/CameraSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/CameraSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/CameraSensor.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/CameraSensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,6 +22,10 @@
+ 
+ package com.ubhave.sensormanager.sensors.pull;
+ 
++import java.io.File;
++import java.io.FileOutputStream;
++
++import android.Manifest;
+ import android.content.Context;
+ import android.hardware.Camera;
+ import android.util.Log;
+@@ -34,13 +38,9 @@
+ import com.ubhave.sensormanager.process.pull.CameraProcessor;
+ import com.ubhave.sensormanager.sensors.SensorUtils;
+ 
+-import java.io.File;
+-import java.io.FileOutputStream;
+-
+ public class CameraSensor extends AbstractMediaSensor
+ {
+ 	private final static String LOG_TAG = "CameraSensor";
+-	private final static String PERMISSION_CAMERA = "android.permission.CAMERA";
+ 	private final static String IMAGE_FILE_PREFIX = "image";
+ 	private final static String IMAGE_FILE_SUFFIX = ".jpg";
+ 
+@@ -59,7 +59,7 @@
+ 			{
+ 				if (cameraSensor == null)
+ 				{
+-					if (permissionGranted(context, PERMISSION_CAMERA))
++					if (permissionGranted(context, Manifest.permission.CAMERA))
+ 					{
+ 						cameraSensor = new CameraSensor(context);
+ 					}
+@@ -107,12 +107,13 @@
+ 		try
+ 		{
+ 			imageFile = getMediaFile();
+-			int cameraType = Camera.CameraInfo.CAMERA_FACING_FRONT;
++			int cameraType = android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT;
+ 			if (sensorConfig.containsParameter(CameraConfig.CAMERA_TYPE))
+ 			{
+ 				cameraType = (Integer) sensorConfig.getParameter(CameraConfig.CAMERA_TYPE);
+ 			}
+ 			camera = Camera.open(cameraType);
++			camera.startPreview();
+ 			camera.takePicture(null, null, callBack);
+ 			return true;
+ 		}
+@@ -125,7 +126,6 @@
+ 
+ 	private Camera.PictureCallback callBack = new Camera.PictureCallback()
+ 	{
+-
+ 		public void onPictureTaken(byte[] data, Camera camera)
+ 		{
+ 			FileOutputStream outStream = null;
+@@ -134,10 +134,12 @@
+ 				outStream = new FileOutputStream(imageFile);
+ 				outStream.write(data);
+ 				outStream.close();
++				camera.release();
+ 				notifySenseCyclesComplete();
+ 			}
+ 			catch (Exception e)
+ 			{
++				e.printStackTrace();
+ 				if (GlobalConfig.shouldLog())
+ 				{
+ 					Log.d(LOG_TAG, e.getMessage());
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/GyroscopeSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/GyroscopeSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/GyroscopeSensor.java	1969-12-31 17:00:00.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/GyroscopeSensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -0,0 +1,81 @@
++/* **************************************************
++ Copyright (c) 2014
++
++This library was developed as part of the EPSRC Ubhave (Ubiquitous and
++Social Computing for Positive Behaviour Change) Project. For more
++information, please visit http://www.emotionsense.org
++
++Permission to use, copy, modify, and/or distribute this software for any
++purpose with or without fee is hereby granted, provided that the above
++copyright notice and this permission notice appear in all copies.
++
++THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
++WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
++MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
++SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
++IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ ************************************************** */
++
++package com.ubhave.sensormanager.sensors.pull;
++
++import android.content.Context;
++import android.hardware.Sensor;
++
++import com.ubhave.sensormanager.data.pullsensor.GyroscopeData;
++import com.ubhave.sensormanager.process.pull.GyroscopeProcessor;
++import com.ubhave.sensormanager.sensors.SensorUtils;
++
++public class GyroscopeSensor extends AbstractMotionSensor
++{
++	private static final String TAG = "GyroscopeSensor";
++	private static GyroscopeSensor gyroscopeSensor;
++	private static Object lock = new Object();
++
++    private GyroscopeData gyroscopeData;
++
++	public static GyroscopeSensor getGyroscopeSensor(final Context context)
++	{
++		if (gyroscopeSensor == null)
++		{
++			synchronized (lock)
++			{
++				if (gyroscopeSensor == null)
++				{
++					gyroscopeSensor = new GyroscopeSensor(context);
++				}
++			}
++		}
++		return gyroscopeSensor;
++	}
++
++	private GyroscopeSensor(final Context context)
++	{
++		super(context, Sensor.TYPE_GYROSCOPE);
++	}
++
++	protected String getLogTag()
++	{
++		return TAG;
++	}
++
++	public int getSensorType()
++	{
++		return SensorUtils.SENSOR_TYPE_GYROSCOPE;
++	}
++
++	protected GyroscopeData getMostRecentRawData()
++	{
++		return gyroscopeData;
++	}
++	
++	protected void processSensorData()
++	{
++		synchronized (sensorReadings)
++		{
++            GyroscopeProcessor processor = (GyroscopeProcessor) getProcessor();
++            gyroscopeData = processor.process(pullSenseStartTimestamp, sensorReadings, sensorReadingTimestamps, sensorConfig.clone());
++		}
++	}
++}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/LocationSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/LocationSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/LocationSensor.java	2014-05-30 17:16:10.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/LocationSensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,6 +22,7 @@
+ 
+ package com.ubhave.sensormanager.sensors.pull;
+ 
++import android.Manifest;
+ import android.content.Context;
+ import android.location.Location;
+ import android.location.LocationListener;
+@@ -41,8 +42,10 @@
+ public class LocationSensor extends AbstractPullSensor
+ {
+ 	private static final String TAG = "LocationSensor";
+-	private static final String PERMISSION_COARSE = "android.permission.ACCESS_COARSE_LOCATION";
+-	private static final String PERMISSION_FINE = "android.permission.ACCESS_FINE_LOCATION";
++	private static final String[] LOCATION_PERMISSIONS = new String[]{
++		Manifest.permission.ACCESS_COARSE_LOCATION,
++		Manifest.permission.ACCESS_FINE_LOCATION
++	};
+ 
+ 	private static LocationSensor locationSensor;
+ 	private static Object lock = new Object();
+@@ -60,7 +63,7 @@
+ 			{
+ 				if (locationSensor == null)
+ 				{
+-					if (anyPermissionGranted(context, new String[]{PERMISSION_COARSE, PERMISSION_FINE}))
++					if (anyPermissionGranted(context, LOCATION_PERMISSIONS))
+ 					{
+ 						locationSensor = new LocationSensor(context);
+ 					}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/MicrophoneSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/MicrophoneSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/MicrophoneSensor.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/MicrophoneSensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,6 +22,10 @@
+ 
+ package com.ubhave.sensormanager.sensors.pull;
+ 
++import java.io.File;
++import java.util.ArrayList;
++
++import android.Manifest;
+ import android.content.Context;
+ import android.media.MediaRecorder;
+ 
+@@ -32,13 +36,9 @@
+ import com.ubhave.sensormanager.process.pull.MicrophoneProcessor;
+ import com.ubhave.sensormanager.sensors.SensorUtils;
+ 
+-import java.io.File;
+-import java.util.ArrayList;
+-
+ public class MicrophoneSensor extends AbstractMediaSensor
+ {
+ 	private final static String LOG_TAG = "MicrophoneSensor";
+-	private final static String PERMISSION_RECORD_AUDIO = "android.permission.RECORD_AUDIO";
+ 	private final static String AUDIO_FILE_PREFIX = "audio";
+ 	private final static String AUDIO_FILE_SUFFIX = ".3gpp";
+ 	
+@@ -60,7 +60,7 @@
+ 			{
+ 				if (microphoneSensor == null)
+ 				{
+-					if (permissionGranted(context, PERMISSION_RECORD_AUDIO))
++					if (permissionGranted(context, Manifest.permission.RECORD_AUDIO))
+ 					{
+ 						microphoneSensor = new MicrophoneSensor(context);
+ 					}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/SMSContentReaderSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/SMSContentReaderSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/SMSContentReaderSensor.java	2014-05-30 17:16:10.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/SMSContentReaderSensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,6 +22,7 @@
+ 
+ package com.ubhave.sensormanager.sensors.pull;
+ 
++import android.Manifest;
+ import android.content.Context;
+ 
+ import com.ubhave.sensormanager.ESException;
+@@ -31,8 +32,6 @@
+ public class SMSContentReaderSensor extends AbstractContentReaderSensor
+ {
+ 	private static final String LOG_TAG = "SMSContentReaderSensor";
+-	private static final String PERMISSION_READ_SMS = "android.permission.READ_SMS";
+-	
+ 	private static SMSContentReaderSensor smsContentReaderSensor;
+ 
+ 	public static SMSContentReaderSensor getSMSContentReaderSensor(Context context) throws ESException
+@@ -43,7 +42,7 @@
+ 			{
+ 				if (smsContentReaderSensor == null)
+ 				{
+-					if (permissionGranted(context, PERMISSION_READ_SMS))
++					if (permissionGranted(context, Manifest.permission.READ_SMS))
+ 					{
+ 						smsContentReaderSensor = new SMSContentReaderSensor(context);
+ 					}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/WifiSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/WifiSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/pull/WifiSensor.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/pull/WifiSensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,6 +22,10 @@
+ 
+ package com.ubhave.sensormanager.sensors.pull;
+ 
++import java.util.ArrayList;
++import java.util.List;
++
++import android.Manifest;
+ import android.content.BroadcastReceiver;
+ import android.content.Context;
+ import android.content.Intent;
+@@ -36,15 +40,14 @@
+ import com.ubhave.sensormanager.process.pull.WifiProcessor;
+ import com.ubhave.sensormanager.sensors.SensorUtils;
+ 
+-import java.util.ArrayList;
+-import java.util.List;
+-
+ public class WifiSensor extends AbstractPullSensor
+ {
+ 	private static final String TAG = "WifiSensor";
+-	private static final String PERMISSION_ACCESS_WIFI = "android.permission.ACCESS_WIFI_STATE";
+-	private static final String PERMISSION_ACCESS_NET = "android.permission.ACCESS_NETWORK_STATE";
+-	private static final String PERMISSION_CHANGE_WIFI = "android.permission.CHANGE_WIFI_STATE";
++	private static final String[] REQUIRED_PERMISSIONS = new String[]{
++		Manifest.permission.ACCESS_WIFI_STATE,
++		Manifest.permission.ACCESS_NETWORK_STATE,
++		Manifest.permission.CHANGE_WIFI_STATE
++	};
+ 
+ 	private static WifiSensor wifiSensor;
+ 	private static Object lock = new Object();
+@@ -63,7 +66,7 @@
+ 			{
+ 				if (wifiSensor == null)
+ 				{
+-					if (allPermissionsGranted(context, new String[]{PERMISSION_ACCESS_WIFI, PERMISSION_ACCESS_NET, PERMISSION_CHANGE_WIFI}))
++					if (allPermissionsGranted(context, REQUIRED_PERMISSIONS))
+ 					{
+ 						wifiSensor = new WifiSensor(context);
+ 					}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/push/AbstractPushSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/push/AbstractPushSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/push/AbstractPushSensor.java	2014-05-30 17:16:10.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/push/AbstractPushSensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -36,14 +36,9 @@
+ 
+ public abstract class AbstractPushSensor extends AbstractSensor implements PushSensor
+ {
+-
+ 	protected SensorDataListener sensorDataListener;
+ 	protected BroadcastReceiver broadcastReceiver;
+ 
+-	protected abstract void onBroadcastReceived(Context context, Intent intent);
+-
+-	protected abstract IntentFilter[] getIntentFilters();
+-
+ 	public AbstractPushSensor(Context context)
+ 	{
+ 		super(context);
+@@ -63,6 +58,10 @@
+ 		};
+ 	}
+ 
++	protected abstract void onBroadcastReceived(Context context, Intent intent);
++
++	protected abstract IntentFilter[] getIntentFilters();
++
+ 	public void startSensing(SensorDataListener listener) throws ESException
+ 	{
+ 		if (isSensing)
+@@ -133,5 +132,4 @@
+ 			sensorDataListener.onDataSensed(sensorData);
+ 		}
+ 	}
+-
+ }
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/push/BatterySensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/push/BatterySensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/push/BatterySensor.java	2014-05-30 17:16:10.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/push/BatterySensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,6 +22,7 @@
+ 
+ package com.ubhave.sensormanager.sensors.push;
+ 
++import android.Manifest;
+ import android.content.Context;
+ import android.content.Intent;
+ import android.content.IntentFilter;
+@@ -34,8 +35,6 @@
+ public class BatterySensor extends AbstractPushSensor
+ {
+ 	private static final String TAG = "BatterySensor";
+-	private static final String PERMISSION_BATTERY = "android.permission.BATTERY_STATS";
+-
+ 	private static BatterySensor batterySensor;
+ 	private static Object lock = new Object();
+ 
+@@ -47,7 +46,7 @@
+ 			{
+ 				if (batterySensor == null)
+ 				{
+-					if (android.os.Build.VERSION.SDK_INT >= 19 || permissionGranted(context, PERMISSION_BATTERY))
++					if (android.os.Build.VERSION.SDK_INT >= 19 || permissionGranted(context, Manifest.permission.BATTERY_STATS))
+ 					{
+ 						batterySensor = new BatterySensor(context);
+ 					}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/push/ConnectionStateSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/push/ConnectionStateSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/push/ConnectionStateSensor.java	2014-05-30 17:16:10.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/push/ConnectionStateSensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,6 +22,7 @@
+ 
+ package com.ubhave.sensormanager.sensors.push;
+ 
++import android.Manifest;
+ import android.content.Context;
+ import android.content.Intent;
+ import android.content.IntentFilter;
+@@ -40,8 +41,7 @@
+ public class ConnectionStateSensor extends AbstractPushSensor
+ {
+ 	private static final String TAG = "ConnectionStateSensor";
+-	private static final String PERMISSION_ACCESS_WIFI = "android.permission.ACCESS_WIFI_STATE";
+-	private static final String PERMISSION_ACCESS_NET = "android.permission.ACCESS_NETWORK_STATE";
++	private static final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE};
+ 	
+ 	private static ConnectionStateSensor connectionSensor;
+ 	private static final Object lock = new Object();
+@@ -54,7 +54,7 @@
+ 			{
+ 				if (connectionSensor == null)
+ 				{
+-					if (allPermissionsGranted(context, new String[]{PERMISSION_ACCESS_WIFI, PERMISSION_ACCESS_NET}))
++					if (allPermissionsGranted(context, REQUIRED_PERMISSIONS))
+ 					{
+ 						connectionSensor = new ConnectionStateSensor(context);
+ 					}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/push/LightSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/push/LightSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/push/LightSensor.java	1969-12-31 17:00:00.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/push/LightSensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -0,0 +1,125 @@
++/* **************************************************
++ Copyright (c) 2012, University of Cambridge
++ Neal Lathia, neal.lathia@cl.cam.ac.uk
++ Kiran Rachuri, kiran.rachuri@cl.cam.ac.uk
++
++This library was developed as part of the EPSRC Ubhave (Ubiquitous and
++Social Computing for Positive Behaviour Change) Project. For more
++information, please visit http://www.emotionsense.org
++
++Permission to use, copy, modify, and/or distribute this software for any
++purpose with or without fee is hereby granted, provided that the above
++copyright notice and this permission notice appear in all copies.
++
++THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
++WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
++MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
++SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
++IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ ************************************************** */
++
++package com.ubhave.sensormanager.sensors.push;
++
++import android.content.Context;
++import android.content.Intent;
++import android.content.IntentFilter;
++import android.hardware.Sensor;
++import android.hardware.SensorEvent;
++import android.hardware.SensorEventListener;
++import android.hardware.SensorManager;
++
++import com.ubhave.sensormanager.data.pushsensor.LightData;
++import com.ubhave.sensormanager.process.push.LightProcessor;
++import com.ubhave.sensormanager.sensors.SensorUtils;
++
++public class LightSensor extends AbstractPushSensor
++{
++	private static final String TAG = "LightSensor";
++
++	private static LightSensor LightSensor;
++	private static Object lock = new Object();
++
++	private SensorEventListener sensorEventListener;
++
++	public static LightSensor getLightSensor(final Context context)
++	{
++		if (LightSensor == null)
++		{
++			synchronized (lock)
++			{
++				if (LightSensor == null)
++				{
++					LightSensor = new LightSensor(context);
++				}
++			}
++		}
++		return LightSensor;
++	}
++
++	private LightSensor(Context context)
++	{
++		super(context);
++		sensorEventListener = new SensorEventListener()
++		{
++			public void onSensorChanged(SensorEvent event)
++			{
++				try
++				{
++					float light = event.values[0];
++					float maxRange = event.sensor.getMaximumRange();
++
++					LightProcessor processor = (LightProcessor) getProcessor();
++					LightData lightData = processor.process(System.currentTimeMillis(), sensorConfig.clone(), light, maxRange);
++
++					onDataSensed(lightData);
++				}
++				catch (Exception e)
++				{
++					e.printStackTrace();
++				}
++			}
++
++			public void onAccuracyChanged(Sensor sensor, int accuracy)
++			{
++				// ignore
++			}
++		};
++	}
++
++	public String getLogTag()
++	{
++		return TAG;
++	}
++
++	public int getSensorType()
++	{
++		return SensorUtils.SENSOR_TYPE_LIGHT;
++	}
++
++	protected void onBroadcastReceived(Context context, Intent intent)
++	{
++		// ignore
++	}
++
++	protected IntentFilter[] getIntentFilters()
++	{
++		// no intent filters
++		return null;
++	}
++
++	protected boolean startSensing()
++	{
++		SensorManager sensorManager = (SensorManager) applicationContext.getSystemService(Context.SENSOR_SERVICE);
++		boolean registered = sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_NORMAL);
++		return registered;
++	}
++
++	protected void stopSensing()
++	{
++		SensorManager sensorManager = (SensorManager) applicationContext.getSystemService(Context.SENSOR_SERVICE);
++		sensorManager.unregisterListener(sensorEventListener);
++	}
++
++}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/push/PhoneStateSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/push/PhoneStateSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/push/PhoneStateSensor.java	2014-06-05 16:00:38.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/push/PhoneStateSensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,6 +22,7 @@
+ 
+ package com.ubhave.sensormanager.sensors.push;
+ 
++import android.Manifest;
+ import android.content.Context;
+ import android.content.Intent;
+ import android.content.IntentFilter;
+@@ -38,8 +39,7 @@
+ public class PhoneStateSensor extends AbstractPushSensor
+ {
+ 	private static final String TAG = "PhoneStateSensor";
+-	private static final String PERMISSION_OUTGOING = "android.permission.PROCESS_OUTGOING_CALLS";
+-	private static final String PERMISSION_READ_STATE = "android.permission.READ_PHONE_STATE";
++	private static final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.PROCESS_OUTGOING_CALLS, Manifest.permission.READ_PHONE_STATE};
+ 
+ 	private TelephonyManager telephonyManager;
+ 	private PhoneStateListener phoneStateListener;
+@@ -55,7 +55,7 @@
+ 			{
+ 				if (phoneStateSensor == null)
+ 				{
+-					if (allPermissionsGranted(context, new String[]{PERMISSION_OUTGOING, PERMISSION_READ_STATE}))
++					if (allPermissionsGranted(context, REQUIRED_PERMISSIONS))
+ 					{
+ 						phoneStateSensor = new PhoneStateSensor(context);
+ 					}
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/sensors/push/SmsSensor.java ../SensorManager/src/com/ubhave/sensormanager/sensors/push/SmsSensor.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/sensors/push/SmsSensor.java	2014-05-30 17:16:10.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/sensors/push/SmsSensor.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,6 +22,7 @@
+ 
+ package com.ubhave.sensormanager.sensors.push;
+ 
++import android.Manifest;
+ import android.content.ContentResolver;
+ import android.content.Context;
+ import android.content.Intent;
+@@ -42,8 +43,7 @@
+ public class SmsSensor extends AbstractPushSensor
+ {
+ 	private static final String TAG = "SmsSensor";
+-	private static final String PERMISSION_RECEIVE = "android.permission.RECEIVE_SMS";
+-	private static final String PERMISSION_READ = "android.permission.READ_SMS";
++	private static final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS};
+ 	private static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
+ 
+ 	private static SmsSensor smsSensor;
+@@ -60,7 +60,7 @@
+ 			{
+ 				if (smsSensor == null)
+ 				{
+-					if (allPermissionsGranted(context, new String[]{PERMISSION_RECEIVE, PERMISSION_READ}))
++					if (allPermissionsGranted(context, REQUIRED_PERMISSIONS))
+ 					{
+ 						smsSensor = new SmsSensor(context);
+ 					}
+@@ -74,7 +74,7 @@
+ 		return smsSensor;
+ 	}
+ 
+-	private SmsSensor(Context context)
++	private SmsSensor(final Context context)
+ 	{
+ 		super(context);
+ 		// Create a content observer for sms
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/tasks/AbstractSensorTask.java ../SensorManager/src/com/ubhave/sensormanager/tasks/AbstractSensorTask.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/tasks/AbstractSensorTask.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/tasks/AbstractSensorTask.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,6 +22,8 @@
+ 
+ package com.ubhave.sensormanager.tasks;
+ 
++import java.util.ArrayList;
++
+ import android.util.Log;
+ 
+ import com.ubhave.sensormanager.ESException;
+@@ -34,8 +36,6 @@
+ import com.ubhave.sensormanager.sensors.SensorInterface;
+ import com.ubhave.sensormanager.sensors.SensorUtils;
+ 
+-import java.util.ArrayList;
+-
+ public abstract class AbstractSensorTask extends Thread
+ {
+ 	private class StopTask extends Thread
+diff -ENwbur sensorManager/src/main/java/com/ubhave/sensormanager/tasks/SubscriptionList.java ../SensorManager/src/com/ubhave/sensormanager/tasks/SubscriptionList.java
+--- sensorManager/src/main/java/com/ubhave/sensormanager/tasks/SubscriptionList.java	2014-06-05 22:03:01.000000000 -0700
++++ ../SensorManager/src/com/ubhave/sensormanager/tasks/SubscriptionList.java	2014-06-11 22:20:22.000000000 -0700
+@@ -22,16 +22,16 @@
+ 
+ package com.ubhave.sensormanager.tasks;
+ 
++import java.util.ArrayList;
++import java.util.List;
++import java.util.Random;
++
+ import android.util.Log;
+ import android.util.SparseArray;
+ 
+ import com.ubhave.sensormanager.ESException;
+ import com.ubhave.sensormanager.config.GlobalConfig;
+ 
+-import java.util.ArrayList;
+-import java.util.List;
+-import java.util.Random;
+-
+ public class SubscriptionList
+ {
+ 	private static String TAG = "SubscriptionList";

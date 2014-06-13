@@ -1,0 +1,1 @@
+include ':TreatmentAdherence', ':sensorManager', ':sensorDataManager', ':triggerManager'

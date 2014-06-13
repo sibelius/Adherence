@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">TreatmentAdherence</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="button_startSensing">Start Sensing</string>
+    <string name="button_stopSensing">Stop Sensing</string>
+    <string name="service_notification">Sensing Running</string>
+    <string name="notification_title">Notification Title</string>
+    <string name="notification_message">Notification Message</string>
+    <string name="activity">Activity:</string>
+    <string name="button_startActivity">Start Activity</string>
+    <string name="button_stopActivity">Stop Activity</string>
+    <string name="extra_data">Extra Data</string>
+
+    <string-array name="activity_array">
+        <item>Walking</item>
+        <item>Running</item>
+        <item>Walking_Upstairs</item>
+        <item>Walking_Downstairs</item>
+        <item>Sitting</item>
+        <item>Standing</item>
+        <item>Laying</item>
+        <item>Biking</item>
+        <item>Sleeping</item>
+    </string-array>
+
+    <string-array name="extra_data">
+        <item>Hand</item>
+        <item>Pocket</item>
+    </string-array>
+</resources>

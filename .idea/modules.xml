@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Adherence.iml" filepath="$PROJECT_DIR$/Adherence.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TreatmentAdherence/TreatmentAdherence.iml" filepath="$PROJECT_DIR$/TreatmentAdherence/TreatmentAdherence.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sensorDataManager/sensorDataManager.iml" filepath="$PROJECT_DIR$/sensorDataManager/sensorDataManager.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sensorManager/sensorManager.iml" filepath="$PROJECT_DIR$/sensorManager/sensorManager.iml" />
+      <module fileurl="file://$PROJECT_DIR$/triggerManager/triggerManager.iml" filepath="$PROJECT_DIR$/triggerManager/triggerManager.iml" />
+    </modules>
+  </component>
+</project>
+

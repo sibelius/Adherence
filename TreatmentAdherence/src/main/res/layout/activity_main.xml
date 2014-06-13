@@ -1,0 +1,41 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="${relativePackage}.${activityClass}">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/activity"
+        android:id="@+id/activity"
+        android:textSize="20sp"
+        android:gravity="center"/>
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_activity"
+        android:layout_toRightOf="@+id/activity"
+        />
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_extra"
+        android:layout_below="@id/spinner_activity"/>
+        />
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spinner_extra"
+        android:onClick="switchActivity"
+        android:text="@string/button_startActivity"
+        android:id="@+id/activity_button"
+        android:enabled="false"/>
+    <Button
+        android:id="@+id/sensing_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:onClick="switchSensing"
+        android:text="@string/button_startSensing" />
+</RelativeLayout>
