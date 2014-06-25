@@ -5,4 +5,7 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <color name="blue">#0000ff</color>
+    <color name="green">#00ff00</color>
+
 </resources>

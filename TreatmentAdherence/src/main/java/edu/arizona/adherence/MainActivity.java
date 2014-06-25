@@ -7,23 +7,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
-import android.util.Log;
+import android.os.CountDownTimer;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.Toast;
+import android.widget.TextView;
+
+import com.ubhave.datahandler.loggertypes.AbstractDataLogger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class MainActivity extends Activity {
 
     private static final String TAG_LABEL = "Label";
+    private static final String TAG_PROFILE = "Profile";
 
     private static final String TAG_ACTIVITY = "activity";
     private static final String TAG_EVENT = "event";
@@ -31,66 +34,178 @@ public class MainActivity extends Activity {
     private static final String TAG_ACTIVITY_STOP = "stop";
     private static final String TAG_TIMESTAMP = "timestamp";
     private static final String TAG_LOCAL_TIME = "localTime";
-    private static final String TAG_EXTRA_DATA = "extraData";
 
-    private static final String PREFS_NAME = "TreatmentPrefs";
-
-    private boolean isSensing;
-    private boolean isPerforming; // Check whether the user is performing the activity
+    private static final String TAG_WALKING = "Walking";
+    private static final String TAG_RUNNING = "Running";
+    private static final String TAG_UPSTAIRS = "Walking Upstairs";
+    private static final String TAG_DOWNSTAIRS = "Walking Downstairs";
+    private static final String TAG_SITTING = "Sitting";
+    private static final String TAG_STANDING = "Standing";
+    private static final String TAG_LAYING = "Laying";
+    private static final String TAG_BIKING = "Biking";
 
     private SharedPreferences mSettings;
-    private Button sensingButton;
     private Button activityButton;
     private Spinner mActivities;
-    private Spinner mExtra;
+    private TextView mCountDown;
+    private TextView mRemaining;
 
-    private SensingStoreOnlyLogger dataLogger;
+    private AbstractDataLogger dataLogger;
+
+    // Is performing any physical activity
+    private boolean isPerforming = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        isSensing = false;
-        isPerforming = false;
 
-        mSettings = getSharedPreferences(PREFS_NAME, 0);
-        sensingButton = (Button) findViewById(R.id.sensing_button);
+        mSettings = getSharedPreferences(ProfileActivity.PREFS_NAME, 0);
         activityButton = (Button) findViewById(R.id.activity_button);
+        activityButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startClick();
+            }
+        });
 
-        mActivities = (Spinner) findViewById(R.id.spinner_activity);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                this, R.array.activity_array, android.R.layout.simple_spinner_item);
+        mCountDown = (TextView) findViewById(R.id.countdown);
+        mRemaining = (TextView) findViewById(R.id.txtRemaining);
+
+        mActivities = (Spinner) findViewById(R.id.spnActivity);
+
+        CustomAdapter adapter = new CustomAdapter(this, R.layout.spinner_rows, getActivityData());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mActivities.setAdapter(adapter);
 
-        mExtra = (Spinner) findViewById(R.id.spinner_extra);
-        ArrayAdapter<CharSequence> adapterExtra = ArrayAdapter.createFromResource(
-                this, R.array.extra_data, android.R.layout.simple_spinner_item);
-        adapterExtra.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mExtra.setAdapter(adapterExtra);
+        mActivities.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                ImageText it = (ImageText) mActivities.getSelectedItem();
+                int remaining = mSettings.getInt(getResources().getString(it.getDescription()),5);
+                mRemaining.setText(String.valueOf(remaining));
+            }
 
-        dataLogger = new SensingStoreOnlyLogger(this);
-        // Device ID
-        TelephonyManager mngr = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        dataLogger.setDeviceId(mngr.getDeviceId());
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+        mActivities.setSelection(0);
 
-        //AbstractDataLogger dataLogger = new SensingStoreOnlyLogger(this);
-        //sensor = new SensingListener(this, dataLogger);
-        //Intent startServiceIntent = new Intent(this, SensingService.class);
-        //startService(startServiceIntent);
+        dataLogger = new SensingAsyncTransferLogger(this);
 
-        if (isMyServiceRunning(SensingService.class)) {
-            isSensing = true;
-            switchButtonText();
+        boolean newuser = getIntent().getBooleanExtra(ProfileActivity.PROFILE_NEWUSER, true);
+        if (newuser)
+            saveProfile();
+    }
+
+    private void startClick() {
+
+        activityButton.setEnabled(false);
+        mActivities.setEnabled(false);
+        isPerforming = true;
+        manageService(true);
+
+        new CountDownTimer(64 * 1000, 1000) {
+            public void onTick(long millisUntilFinished) {
+                long seconds = millisUntilFinished / 1000;
+                if (seconds > 60) {
+                    if (seconds == 61) {
+                        mCountDown.setText("Go!");
+                        logEvent(TAG_ACTIVITY_START);
+                    } else
+                        mCountDown.setText(String.valueOf(seconds - 61));
+                } else {
+                    if (seconds == 12)
+                        logEvent(TAG_ACTIVITY_START);
+                    mCountDown.setText(seconds + " seconds");
+                }
+            }
+
+            public void onFinish() {
+                mCountDown.setText("Done!");
+                logEvent(TAG_ACTIVITY_STOP);
+
+                activityButton.setEnabled(true);
+                mActivities.setEnabled(true);
+
+                ImageText it = (ImageText) mActivities.getSelectedItem();
+                String activity = getResources().getString(it.getDescription());
+
+                int remaining = mSettings.getInt(activity, 5);
+                if (remaining != 0) {
+                    SharedPreferences.Editor editor = mSettings.edit();
+                    editor.putInt(activity, remaining - 1);
+                    editor.commit();
+
+                    mRemaining.setText(String.valueOf(remaining-1));
+                }
+                isPerforming = false;
+            }
+        }.start();
+    }
+
+    private void logEvent(String event) {
+        JSONObject json = new JSONObject();
+        try {
+            int activityId = ((ImageText) mActivities.getSelectedItem()).getDescription();
+            json.put(TAG_ACTIVITY, getResources().getString(activityId));
+            json.put(TAG_EVENT, event);
+            json.put(TAG_TIMESTAMP, System.currentTimeMillis());
+            json.put(TAG_LOCAL_TIME, localTime());
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-/*
-        SensorManager mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        List<Sensor> deviceSensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
 
-        for (Sensor s : deviceSensors) {
-            Log.d("SENSOR", s.toString());
+        dataLogger.logExtra(TAG_LABEL, json);
+    }
+
+    private ArrayList<ImageText> getActivityData() {
+        ArrayList<ImageText> values = new ArrayList<ImageText>();
+
+        values.add(new ImageText(R.string.walking, R.drawable.walking));
+        values.add(new ImageText(R.string.running, R.drawable.running));
+        values.add(new ImageText(R.string.upstairs, R.drawable.upstairs));
+        values.add(new ImageText(R.string.downstairs, R.drawable.downstairs));
+        values.add(new ImageText(R.string.sitting, R.drawable.sitting));
+        values.add(new ImageText(R.string.standing, R.drawable.standing));
+        values.add(new ImageText(R.string.laying, R.drawable.laying));
+        values.add(new ImageText(R.string.biking, R.drawable.biking));
+
+        return values;
+    }
+
+    private void saveProfile() {
+        String name = mSettings.getString(ProfileActivity.NAME, "unknown" + System.currentTimeMillis());
+        int age = mSettings.getInt(ProfileActivity.AGE, 0);
+        String gender = mSettings.getString(ProfileActivity.GENDER, "male");
+        float height = mSettings.getFloat(ProfileActivity.HEIGHT, 0.0f);
+        float weight = mSettings.getFloat(ProfileActivity.WEIGHT, 0.0f);
+
+        JSONObject json = new JSONObject();
+        try {
+            json.put(ProfileActivity.NAME, name);
+            json.put(ProfileActivity.AGE, age);
+            json.put(ProfileActivity.GENDER, gender);
+            json.put(ProfileActivity.HEIGHT, height);
+            json.put(ProfileActivity.WEIGHT, weight);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-*/
+
+        dataLogger.logExtra(TAG_PROFILE, json);
+
+        // Activities statistics
+        SharedPreferences.Editor editor = mSettings.edit();
+        editor.putInt(TAG_WALKING, 5);
+        editor.putInt(TAG_RUNNING, 5);
+        editor.putInt(TAG_UPSTAIRS, 5);
+        editor.putInt(TAG_DOWNSTAIRS, 5);
+        editor.putInt(TAG_SITTING, 5);
+        editor.putInt(TAG_STANDING, 5);
+        editor.putInt(TAG_LAYING, 5);
+        editor.putInt(TAG_BIKING, 5);
+        editor.apply();
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -107,76 +222,35 @@ public class MainActivity extends Activity {
     protected void onPause()
     {
         super.onPause();
-        SharedPreferences.Editor editor = mSettings.edit();
 
-        editor.clear();
-        editor.putBoolean("sensing", isSensing);
-        editor.putBoolean("performing", isPerforming);
-        editor.commit();
+        if (!isPerforming) {
+            // Stop the service to collect the data
+            manageService(false);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        isSensing = mSettings.getBoolean("sensing", false);
-        isPerforming = mSettings.getBoolean("performing", false);
+        // Start the service to collect the data
+        //manageService(true);
+    }
 
-        Log.d("isSensing", String.valueOf(isSensing));
-        Log.d("isPerforming", String.valueOf(isPerforming));
-        switchButtonText();
-
-        if(isPerforming) {
-            activityButton.setText(R.string.button_stopActivity);
-            sensingButton.setEnabled(false);
-            mActivities.setEnabled(false);
-        } else {
-            activityButton.setText(R.string.button_startActivity);
-            sensingButton.setEnabled(true);
-            mActivities.setEnabled(true);
-        }
+    private void manageService(boolean start) {
+        Intent serviceIntent = new Intent(this, SensingService.class);
+        if (start)
+            startService(serviceIntent);
+        else
+            stopService(serviceIntent);
     }
 
     @Override
     protected void onDestroy() {
+
         super.onDestroy();
-    }
 
-    /*
-             * Listener for UI button
-             */
-    public void switchSensing(final View view)
-    {
-        isSensing = !isSensing;
-        if (switchSensing()) {
-            switchButtonText();
-        }
-    }
-
-    private void switchButtonText()
-    {
-        if (isSensing)
-        {
-            sensingButton.setText(R.string.button_stopSensing);
-            activityButton.setEnabled(true);
-        }
-        else
-        {
-            sensingButton.setText(R.string.button_startSensing);
-            activityButton.setEnabled(false);
-        }
-    }
-
-    private boolean switchSensing()
-    {
-        if (isSensing) {
-            Intent startServiceIntent = new Intent(this, SensingService.class);
-            startService(startServiceIntent);
-        } else {
-            Intent stopServiceIntent = new Intent(this, SensingService.class);
-            stopService(stopServiceIntent);
-        }
-        return true;
+        manageService(false);
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -185,49 +259,5 @@ public class MainActivity extends Activity {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss zZ");
         return dateFormat.format(calendar.getTime());
-    }
-
-    //
-    public void switchActivity(final View view) {
-        if (!isPerforming) {
-            JSONObject json = new JSONObject();
-            try {
-                json.put(TAG_ACTIVITY, mActivities.getSelectedItem().toString());
-                json.put(TAG_EVENT, TAG_ACTIVITY_START);
-                json.put(TAG_TIMESTAMP, System.currentTimeMillis());
-                json.put(TAG_LOCAL_TIME, localTime());
-                json.put(TAG_EXTRA_DATA, mExtra.getSelectedItem().toString());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            dataLogger.logExtra(TAG_LABEL, json);
-
-            activityButton.setText(R.string.button_stopActivity);
-            sensingButton.setEnabled(false);
-            mActivities.setEnabled(false);
-            Toast toast = Toast.makeText(this, "Activity Started", Toast.LENGTH_SHORT);
-            toast.show();
-        } else {
-            JSONObject json = new JSONObject();
-            try {
-                json.put(TAG_ACTIVITY, mActivities.getSelectedItem().toString());
-                json.put(TAG_EVENT, TAG_ACTIVITY_STOP);
-                json.put(TAG_TIMESTAMP, System.currentTimeMillis());
-                json.put(TAG_LOCAL_TIME, localTime());
-                json.put(TAG_EXTRA_DATA, mExtra.getSelectedItem().toString());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            dataLogger.logExtra(TAG_LABEL, json);
-
-            activityButton.setText(R.string.button_startActivity);
-            sensingButton.setEnabled(true);
-            mActivities.setEnabled(true);
-            Toast toast = Toast.makeText(this, "Activity Stopped", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-        isPerforming = !isPerforming;
     }
 }

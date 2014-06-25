@@ -2,23 +2,16 @@ package edu.arizona.adherence;
 
 import android.content.Context;
 import android.util.Log;
-import android.view.textservice.SentenceSuggestionsInfo;
 
 import com.ubhave.dataformatter.DataFormatter;
-import com.ubhave.datahandler.config.DataStorageConfig;
 import com.ubhave.datahandler.loggertypes.AbstractDataLogger;
 import com.ubhave.sensormanager.ESException;
 import com.ubhave.sensormanager.ESSensorManager;
 import com.ubhave.sensormanager.SensorDataListener;
-import com.ubhave.sensormanager.config.sensors.pull.CameraConfig;
 import com.ubhave.sensormanager.config.sensors.pull.LocationConfig;
-import com.ubhave.sensormanager.config.sensors.pull.MicrophoneConfig;
-import com.ubhave.sensormanager.config.sensors.pull.MotionSensorConfig;
 import com.ubhave.sensormanager.config.sensors.pull.PullSensorConfig;
 import com.ubhave.sensormanager.data.SensorData;
-import com.ubhave.sensormanager.sensors.SensorInterface;
 import com.ubhave.sensormanager.sensors.SensorUtils;
-import com.ubhave.sensormanager.sensors.pull.PullSensor;
 
 import java.util.ArrayList;
 
@@ -57,19 +50,20 @@ public class SensingListener implements SensorDataListener {
             SensorUtils.SENSOR_TYPE_GRAVITY,
             SensorUtils.SENSOR_TYPE_LINEAR_ACCELERATION,
 
-            SensorUtils.SENSOR_TYPE_ZEPHYR,
+            //SensorUtils.SENSOR_TYPE_ZEPHYR,
 
             SensorUtils.SENSOR_TYPE_SCREEN,
             SensorUtils.SENSOR_TYPE_BATTERY,
-            SensorUtils.SENSOR_TYPE_LIGHT,
+            //SensorUtils.SENSOR_TYPE_LIGHT,
             SensorUtils.SENSOR_TYPE_LOCATION,
-            SensorUtils.SENSOR_TYPE_MICROPHONE
+            //SensorUtils.SENSOR_TYPE_MICROPHONE
     };
 
     public SensingListener(final Context context, final AbstractDataLogger logger) {
         this.context = context;
         this.dataLogger = logger;
         try {
+            System.out.println("ESSensor Activity");
             sensorManager = ESSensorManager.getSensorManager(context);
             setSensorConfig();
         } catch(ESException e) {
@@ -82,8 +76,10 @@ public class SensingListener implements SensorDataListener {
         if (sensorManager != null) {
             try {
                 // 50 HZ
-                // Sleep for only 1 second, and get more data
-                long sleepMotion = 1000L;
+                // sleep only 1 second, necessary to save the data
+                long sleepMotion = 1 * 1000L;
+                // Sample 25 seconds each time
+                long sampleWindow = 25 * 1000L;
 
                 /*
                  * Set Motion sensing params
@@ -100,8 +96,18 @@ public class SensingListener implements SensorDataListener {
                 sensorManager.setSensorConfig(SensorUtils.SENSOR_TYPE_LINEAR_ACCELERATION,
                         PullSensorConfig.POST_SENSE_SLEEP_LENGTH_MILLIS, sleepMotion);
 
-                // Sleep for 1 minute and gather more data
-                long locationSleep = 1 * 60 * 1000L;
+                // Sense window
+                sensorManager.setSensorConfig(SensorUtils.SENSOR_TYPE_ACCELEROMETER,
+                        PullSensorConfig.SENSE_WINDOW_LENGTH_MILLIS, sampleWindow);
+                sensorManager.setSensorConfig(SensorUtils.SENSOR_TYPE_GYROSCOPE,
+                        PullSensorConfig.SENSE_WINDOW_LENGTH_MILLIS, sampleWindow);
+                sensorManager.setSensorConfig(SensorUtils.SENSOR_TYPE_GRAVITY,
+                        PullSensorConfig.SENSE_WINDOW_LENGTH_MILLIS, sampleWindow);
+                sensorManager.setSensorConfig(SensorUtils.SENSOR_TYPE_LINEAR_ACCELERATION,
+                        PullSensorConfig.SENSE_WINDOW_LENGTH_MILLIS, sampleWindow);
+
+                // Sleep for 10 second and gather more data
+                long locationSleep = 10 * 1000L;
                 /*
                  * Set location sensing params
                  */
@@ -110,12 +116,11 @@ public class SensingListener implements SensorDataListener {
                 sensorManager.setSensorConfig(SensorUtils.SENSOR_TYPE_LOCATION,
                         PullSensorConfig.POST_SENSE_SLEEP_LENGTH_MILLIS, locationSleep);
 
-
                 /*
                  * Set microphone sensing params
                 */
-                sensorManager.setSensorConfig(SensorUtils.SENSOR_TYPE_MICROPHONE, PullSensorConfig.SENSE_WINDOW_LENGTH_MILLIS, 2000L);
-                sensorManager.setSensorConfig(SensorUtils.SENSOR_TYPE_MICROPHONE, PullSensorConfig.POST_SENSE_SLEEP_LENGTH_MILLIS, 5000L);
+                //sensorManager.setSensorConfig(SensorUtils.SENSOR_TYPE_MICROPHONE, PullSensorConfig.SENSE_WINDOW_LENGTH_MILLIS, 2000L);
+                //sensorManager.setSensorConfig(SensorUtils.SENSOR_TYPE_MICROPHONE, PullSensorConfig.POST_SENSE_SLEEP_LENGTH_MILLIS, 5000L);
 
                 /*
                  * Set camera 'sensing' params
@@ -123,12 +128,12 @@ public class SensingListener implements SensorDataListener {
                 sensorManager.setSensorConfig(SensorUtils.SENSOR_TYPE_CAMERA, PullSensorConfig.POST_SENSE_SLEEP_LENGTH_MILLIS, 5000L);
                 sensorManager.setSensorConfig(SensorUtils.SENSOR_TYPE_CAMERA, CameraConfig.CAMERA_TYPE, CameraConfig.CAMERA_TYPE_FRONT);
 */
-                String rootDirectory = (String) dataLogger.getDataManager().getConfig(DataStorageConfig.LOCAL_STORAGE_ROOT_DIRECTORY_NAME);
+//                String rootDirectory = (String) dataLogger.getDataManager().getConfig(DataStorageConfig.LOCAL_STORAGE_ROOT_DIRECTORY_NAME);
 
                 /*
                  * Store audio files to /Sounds
 */
-                sensorManager.setSensorConfig(SensorUtils.SENSOR_TYPE_MICROPHONE, MicrophoneConfig.AUDIO_FILES_DIRECTORY, rootDirectory + "/Sounds");
+//                sensorManager.setSensorConfig(SensorUtils.SENSOR_TYPE_MICROPHONE, MicrophoneConfig.AUDIO_FILES_DIRECTORY, rootDirectory + "/Sounds");
                 /*
                  * Store image files to /Images
 

@@ -1,12 +1,5 @@
 package com.ubhave.datahandler.loggertypes;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
-
-import org.json.JSONObject;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -22,6 +15,13 @@ import com.ubhave.datahandler.except.DataHandlerException;
 import com.ubhave.sensormanager.config.GlobalConfig;
 import com.ubhave.sensormanager.data.SensorData;
 
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashSet;
+
 public abstract class AbstractDataLogger
 {
 	private final static String LOG_TAG = "AbstractDataLogger";
@@ -29,7 +29,9 @@ public abstract class AbstractDataLogger
 	protected final static String TAG_INTERACTION = "Interaction";
 	protected final static String TAG_ERROR = "Error";
 	
+	private final static String TAG_LOGGER = "logger";
 	private final static String TAG_USER_ID = "userId";
+	private final static String TAG_DEVICE_ID = "deviceId";
 	private final static String TAG_TIMESTAMP = "timestamp";
 	private final static String TAG_LOCAL_TIME = "localTime";
 	private final static String TAG_DATA_TYPE = "dataType";
@@ -192,12 +194,33 @@ public abstract class AbstractDataLogger
 		try
 		{
 			JSONObject json = new JSONObject();
-			json.put(TAG_DATA_TYPE, dataType);
-			json.put(TAG_DATA_TITLE, dataTitle);
-			json.put(TAG_DATA_MESSAGE, dataMessage);
+			if (dataType != null)
+			{
+				json.put(TAG_DATA_TYPE, dataType);
+			}
+			if (dataTitle != null)
+			{
+				json.put(TAG_DATA_TITLE, dataTitle);
+			}
+			if (dataMessage != null)
+			{
+				json.put(TAG_DATA_MESSAGE, dataMessage);
+			}
 			json.put(TAG_TIMESTAMP, System.currentTimeMillis());
 			json.put(TAG_LOCAL_TIME, localTime());
-			json.put(TAG_USER_ID, getUniqueUserId());
+			
+			String userId = getUniqueUserId();
+            Log.d("fUSERID", userId);
+			if (userId != null)
+			{
+				json.put(TAG_USER_ID, userId);
+			}
+			String deviceId = getDeviceId();
+			if (deviceId != null)
+			{
+				json.put(TAG_DEVICE_ID, deviceId);
+			}
+			
 			return json;
 		}
 		catch (Exception e)
@@ -253,6 +276,11 @@ public abstract class AbstractDataLogger
 		{
 			if (tag != null && action != null)
 			{
+				if (!action.has(TAG_LOGGER)) // avoid over-writing user data
+				{
+					JSONObject loggingInfo = format(null, null, null);
+					action.put(TAG_LOGGER, loggingInfo);
+				}
 				dataManager.logExtra(tag, action.toString());
 			}
 		}

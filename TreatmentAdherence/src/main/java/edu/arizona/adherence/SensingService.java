@@ -7,8 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.telephony.TelephonyManager;
-import android.util.Log;
-import android.view.SurfaceView;
 import android.widget.Toast;
 
 import com.ubhave.datahandler.loggertypes.AbstractDataLogger;
@@ -32,17 +30,23 @@ public class SensingService extends Service {
     public void onCreate() {
         // The service is being created
         try {
+            System.out.println("ESSensor Service");
             sensorManager = ESSensorManager.getSensorManager(this);
         } catch (ESException e) {
             e.printStackTrace();
         }
 
-        SensingStoreOnlyLogger dataLogger = new SensingStoreOnlyLogger(this);
-        // Device ID
-        TelephonyManager mngr = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        dataLogger.setDeviceId(mngr.getDeviceId());
+        String userId = getSharedPreferences(ProfileActivity.PREFS_NAME, 0).getString(ProfileActivity.NAME, "unknown");
+
+        //AbstractDataLogger dataLogger = new SensingAsyncTransferLogger(this, userId, getDeviceId());
+        AbstractDataLogger dataLogger = new SensingAsyncTransferLogger(this);
 
         sensor = new SensingListener(this, dataLogger);
+    }
+
+    private String getDeviceId() {
+        TelephonyManager mngr = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        return mngr.getDeviceId();
     }
 
     @Override

@@ -7,19 +7,10 @@
     <string name="service_notification">Sensing Running</string>
     <string name="notification_title">Notification Title</string>
     <string name="notification_message">Notification Message</string>
-    <string name="activity">Activity</string>
+    <string name="activity">Activity:</string>
     <string name="button_startActivity">Start Activity</string>
     <string name="button_stopActivity">Stop Activity</string>
     <string name="extra_data">Extra Data</string>
-
-    <string name="walking">Walking</string>
-    <string name="running">Running</string>
-    <string name="upstairs">Walking Upstairs</string>
-    <string name="downstairs">Walking Downstairs</string>
-    <string name="sitting">Sitting</string>
-    <string name="standing">Standing</string>
-    <string name="laying">Laying</string>
-    <string name="biking">Biking</string>
 
     <string-array name="activity_array">
         <item>Walking</item>
@@ -35,6 +26,7 @@
         <item>Hand</item>
         <item>Pocket</item>
     </string-array>
+
     <string-array name="gender">
         <item>Male</item>
         <item>Female</item>
@@ -48,8 +40,5 @@
     <string name="height_label">Height</string>
     <string name="weight_label">Weight</string>
     <string name="confirm">Confirm Data</string>
-    <string name="title_activity_sensing">SensingActivity</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="remaining">Remaining:</string>
 
 </resources>

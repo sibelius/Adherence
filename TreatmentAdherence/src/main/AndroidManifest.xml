@@ -9,6 +9,7 @@
 
     <!-- PULL SENSOR PERMISSIONS -->
 
+
     <!-- Application -->
     <uses-permission android:name="android.permission.GET_TASKS" />
 
@@ -39,12 +40,14 @@
 
     <!-- PUSH SENSORS -->
 
+
     <!-- Battery -->
     <uses-permission android:name="android.permission.BATTERY_STATS" />
 
     <!-- Connection State -->
     <!-- Declared Above <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> -->
     <!-- Declared Above <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> -->
+
 
     <!-- Phone State -->
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
@@ -54,12 +57,14 @@
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <!-- Declared Above <uses-permission android:name="android.permission.READ_SMS" /> -->
 
+
     <!-- Initialize the service with Android -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
-
 
     <application
         android:allowBackup="true"
@@ -69,11 +74,6 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <service
@@ -82,11 +82,22 @@
             android:exported="true" >
         </service>
 
-        <receiver android:name=".MyBroadcastReceiver">
+        <!--
+        <receiver android:name=".MyBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+        -->
+        <activity
+            android:name=".ProfileActivity"
+            android:label="@string/title_activity_profile" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

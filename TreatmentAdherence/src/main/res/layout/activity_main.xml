@@ -5,37 +5,52 @@
     tools:context="${relativePackage}.${activityClass}">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/activity"
         android:id="@+id/activity"
-        android:textSize="20sp"
-        android:gravity="center"/>
+        android:textSize="40sp"
+        android:gravity="center"
+        android:textColor="@color/blue"/>
+
     <Spinner
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/spinner_activity"
-        android:layout_toRightOf="@+id/activity"
+        android:id="@+id/spnActivity"
+        android:layout_below="@id/activity"
         />
-    <Spinner
-        android:layout_width="match_parent"
+
+    <TextView
+        android:id="@+id/remaining"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/spinner_extra"
-        android:layout_below="@id/spinner_activity"/>
-        />
+        android:layout_below="@id/spnActivity"
+        android:text="@string/remaining"
+        android:textSize="30sp"/>
+
+    <TextView
+        android:id="@+id/txtRemaining"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/spnActivity"
+        android:layout_alignParentRight="true"
+        android:textSize="30sp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="50sp"
+        android:textColor="@color/green"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:id="@+id/countdown"/>
+
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/spinner_extra"
-        android:onClick="switchActivity"
         android:text="@string/button_startActivity"
         android:id="@+id/activity_button"
-        android:enabled="false"/>
-    <Button
-        android:id="@+id/sensing_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:onClick="switchSensing"
-        android:text="@string/button_startSensing" />
+        android:drawableLeft="@drawable/chronometer"
+        />
 </RelativeLayout>

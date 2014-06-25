@@ -6,7 +6,7 @@
         jar="/Users/sibelius/Dropbox/development/AndroidProjects/TA/Adherence/build/intermediates/exploded-aar/Adherence/sensorManager/unspecified/classes.jar"
         jumboMode="false"
         revision="19.1.0"
-        sha1="9edc1c9e508659e6568f36132f536537951a5989"/>
+        sha1="a35283329a4bf4255a5130bf776024e823c20ce9"/>
     <item
         dex="/Users/sibelius/Dropbox/development/AndroidProjects/TA/Adherence/TreatmentAdherence/build/intermediates/pre-dexed/debug/httpmime-4.1.2-1733247909db130d4034651e5265711d22bad843.jar"
         jar="/Users/sibelius/Dropbox/development/AndroidProjects/TA/Adherence/build/intermediates/exploded-aar/Adherence/sensorDataManager/unspecified/libs/httpmime-4.1.2.jar"
@@ -18,7 +18,7 @@
         jar="/Users/sibelius/Dropbox/development/AndroidProjects/TA/Adherence/build/intermediates/exploded-aar/Adherence/sensorDataManager/unspecified/classes.jar"
         jumboMode="false"
         revision="19.1.0"
-        sha1="4df404fcf5632a15d2a77ecd273aa69bcaf13af3"/>
+        sha1="919e281e0ca5a648dcec339639e10d9232d7b866"/>
     <item
         dex="/Users/sibelius/Dropbox/development/AndroidProjects/TA/Adherence/TreatmentAdherence/build/intermediates/pre-dexed/debug/classes-58937fafa93e1da6ce87b991939cf76647cd62d4.jar"
         jar="/Users/sibelius/Dropbox/development/AndroidProjects/TA/Adherence/build/intermediates/exploded-aar/com.android.support/appcompat-v7/19.1.0/classes.jar"
@@ -36,7 +36,7 @@
         jar="/Users/sibelius/Dropbox/development/AndroidProjects/TA/Adherence/build/intermediates/exploded-aar/Adherence/triggerManager/unspecified/classes.jar"
         jumboMode="false"
         revision="19.1.0"
-        sha1="4bfb0f73ddba5b092ca1caaace0a78e95092d9f8"/>
+        sha1="7f230866d6f5bc75fee88a5561b1357f9afdeb97"/>
     <item
         dex="/Users/sibelius/Dropbox/development/AndroidProjects/TA/Adherence/TreatmentAdherence/build/intermediates/pre-dexed/debug/HxMBT-daf11201a573334bbc891f772998262945107f06.jar"
         jar="/Users/sibelius/Dropbox/development/AndroidProjects/TA/Adherence/build/intermediates/exploded-aar/Adherence/sensorManager/unspecified/libs/HxMBT.jar"
